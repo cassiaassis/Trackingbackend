@@ -1,0 +1,253 @@
+{
+    "code": 200,
+    "message": "OK",
+    "order": {
+        "code": 90,
+        "message": "5/O pacote chegou ao destino final.",
+        "info": {
+            "id": "67576576576",
+            "number": "14261-14261-02",
+            "date": "13/12/2025",
+            "prediction": "18/12/2025",
+            "iderp": "-3184",
+            "note": "ORIGEM MICROVIX"
+        },
+        "deliveryTo": {
+            "to": "NOME CLIENTE DESTINO",
+            "document": "326766528008",
+            "mail": "email@gmail.com",
+            "phone": "5555555555",
+            "street": "ENDERECO CONSUMIDOR",
+            "number": "470",
+            "district": "BAIRRO",
+            "complement": "APARTAMENTO 802",
+            "city": "SAO JOSE DOS CAMPOS",
+            "state": "SP",
+            "zipcode": "12246000"
+        },
+        "shippment": {
+            "nick": "LOGGI TECNOLOGIA LTDA",
+            "method": null,
+            "vol": "1",
+            "tracker": "ENX7868291-1",
+            "trackerUrl": "https://oms.tpl.com.br/tracking/5651651/-/156156-14261-02",
+            "url": null
+        },
+        "wharehouse": null,
+        "items": [
+            {
+                "sku": "2037W-NUD8M",
+                "item": "1",
+                "name": "2037W-NUD8M - HANAMI CANVAS NUD - SAPATILHA MEIA PONTA NUDE 8 M",
+                "amount": "1",
+                "unity": "",
+                "part": null,
+                "cubedWeight": 2.3941120000000002,
+                "serial": []
+            },
+            {
+                "sku": "1916-CARSM",
+                "item": "2",
+                "name": "1916-CARSM - ULTRA SOFT SELF KNIT WAISTBAND TRANSITION TIGHT CARAMEL SMALL/MEDIUM",
+                "amount": "1",
+                "unity": "",
+                "part": null,
+                "cubedWeight": 2.3941120000000002,
+                "serial": []
+            },
+            {
+                "sku": "1961-BLKSM",
+                "item": "3",
+                "name": "1961-BLKSM - STIRRUP TIGHT BLACK S/M",
+                "amount": "1",
+                "unity": "",
+                "part": null,
+                "cubedWeight": 0,
+                "serial": []
+            }
+        ],
+        "internalevents": {
+            "created": "2025-12-16 09:31:50.879858",
+            "os": "2025-12-16 09:41:14.164311",
+            "withoutBalance": null,
+            "invoice": "2025-12-16 09:31:50.879858",
+            "startPicking": "2025-12-16 09:41:00",
+            "endPicking": "2025-12-16 09:41:00",
+            "startCheckout": "2025-12-16 09:41:00",
+            "endCheckout": "2025-12-16 09:41:00",
+            "dispatched": "2025-12-16 16:00:00",
+            "in_transit": "2025-12-18 06:28:00",
+            "out_for_delivery": "2025-12-18 10:56:00",
+            "delivered": "2025-12-18 12:10:00",
+            "fail": null,
+            "cancelled": null
+        },
+        "summarybyvolume": [
+            {
+                "tracking": "ENX7868291-1",
+                "vol": 1,
+                "created": "2025-12-16 09:41:00",
+                "deliveryforecast": "2025-12-18",
+                "outfordelivery": "2025-12-18 10:56:00",
+                "intransit": "2025-12-18 06:28:00",
+                "delivered": "2025-12-18 12:10:00",
+                "deliveryfailure": null
+            }
+        ],
+        "shippingevents": [
+            {
+                "internalCode": 90,
+                "code": "5",
+                "info": "O pacote chegou ao destino final.",
+                "complement": null,
+                "date": "2025-12-18 12:10:00",
+                "final": "2025-12-18 12:38:49.998675",
+                "volume": "1"
+            },
+            {
+                "internalCode": 75,
+                "code": "11",
+                "info": "O pacote está a caminho.",
+                "complement": null,
+                "date": "2025-12-18 10:56:00",
+                "final": "2025-12-18 11:53:30.176338",
+                "volume": "1"
+            },
+            {
+                "internalCode": 70,
+                "code": "17",
+                "info": "Tudo certo, o pacote está em uma base da Loggi.",
+                "complement": null,
+                "date": "2025-12-18 06:28:00",
+                "final": "2025-12-18 07:06:51.254915",
+                "volume": "1"
+            },
+            {
+                "internalCode": 70,
+                "code": "17",
+                "info": "Tudo certo, o pacote está em uma base da Loggi.",
+                "complement": null,
+                "date": "2025-12-18 05:33:00",
+                "final": "2025-12-18 05:45:40.259367",
+                "volume": "1"
+            },
+            {
+                "internalCode": 70,
+                "code": "3",
+                "info": "O pacote está em uma base e, em breve, vai estar em transferência.",
+                "complement": null,
+                "date": "2025-12-18 02:18:00",
+                "final": "2025-12-18 02:47:32.767224",
+                "volume": "1"
+            },
+            {
+                "internalCode": 70,
+                "code": "15",
+                "info": "O pacote já teve suas dimensões conferidas.",
+                "complement": null,
+                "date": "2025-12-17 23:12:00",
+                "final": "2025-12-17 23:28:47.355113",
+                "volume": "1"
+            },
+            {
+                "internalCode": 70,
+                "code": "3",
+                "info": "O pacote está em uma base e, em breve, vai estar em transferência.",
+                "complement": null,
+                "date": "2025-12-17 02:50:00",
+                "final": "2025-12-17 04:05:55.57364",
+                "volume": "1"
+            },
+            {
+                "internalCode": 60,
+                "code": "13",
+                "info": "O pacote foi confirmado em uma base da Loggi e vai ser preparado para transferência.",
+                "complement": null,
+                "date": "2025-12-16 16:00:00",
+                "final": "2025-12-16 16:43:05.274328",
+                "volume": "1"
+            },
+            {
+                "internalCode": 510,
+                "code": "1",
+                "info": "A etiqueta de envio já foi criada e o pacote está pronto para a coleta.",
+                "complement": null,
+                "date": "2025-12-16 09:47:00",
+                "final": "2025-12-16 10:09:47.540981",
+                "volume": "1"
+            },
+            {
+                "internalCode": 10,
+                "code": "SP-I",
+                "info": "SEPARACAO INICIADA",
+                "complement": null,
+                "date": "2025-12-16 09:41:14.198809",
+                "final": "2025-12-16 09:41:14.198809",
+                "volume": "1"
+            },
+            {
+                "internalCode": 20,
+                "code": "SP-F",
+                "info": "SEPARACAO FINALIZADA",
+                "complement": null,
+                "date": "2025-12-16 09:41:14.202788",
+                "final": "2025-12-16 09:41:14.202788",
+                "volume": "1"
+            },
+            {
+                "internalCode": 30,
+                "code": "CKO-I",
+                "info": "CHECKOUT INICIADO",
+                "complement": null,
+                "date": "2025-12-16 09:41:14.207172",
+                "final": "2025-12-16 09:41:14.207172",
+                "volume": "1"
+            },
+            {
+                "internalCode": 40,
+                "code": "CKO-F",
+                "info": "CHECKOUT FINALIZADO",
+                "complement": null,
+                "date": "2025-12-16 09:41:14.212588",
+                "final": "2025-12-16 09:41:14.212588",
+                "volume": "1"
+            },
+            {
+                "internalCode": 25,
+                "code": "OMS",
+                "info": "NOTA RECEBIDA",
+                "complement": null,
+                "date": "2025-12-16 09:31:50.897291",
+                "final": "2025-12-16 09:31:50.897291",
+                "volume": "1"
+            },
+            {
+                "internalCode": 1,
+                "code": "OMS",
+                "info": "INTEGRACAO",
+                "complement": null,
+                "date": "2025-12-16 09:31:50.892506",
+                "final": "2025-12-16 09:31:50.892506",
+                "volume": "1"
+            }
+        ],
+        "invoice": [
+            {
+                "number": "16913",
+                "series": "1",
+                "emission": "2025-12-15 10:04:00",
+                "weight": "550",
+                "volumes": "1",
+                "value": "426.52",
+                "key": "42251234158509000189550010000169131082023640",
+                "document": "PG5mZVByb2MgdmVyc2FvPSI0LjAwIiB4bWxucz0iaHR0cDovL3d3dy5wb3J0YWxmaXNjYWwuaW5mLmJyL25mZSI+PE5GZSB4bWxucz0iaHR0cDovL3d3dy5wb3J0YWxmaXNjYWwuaW5mLmJyL25mZSI+PGluZk5GZSBJZD0iTkZlNDIyNTEyMzQxNTg1MDkwMDAxODk1NTAwMTAwMDAxNjkxMzEwODIwMjM2NDAiIHZlcnNhbz0iNC4wMCI+PGlkZT48Y1VGPjQyPC9jVUY+PGNORj4wODIwMjM2NDwvY05GPjxuYXRPcD5TIC0gVkVOREFTIERFIE1FUkNBRE9SSUFTPC9uYXRPcD48bW9kPjU1PC9tb2Q+PHNlcmllPjE8L3NlcmllPjxuTkY+MTY5MTM8L25ORj48ZGhFbWk+MjAyNS0xMi0xNVQxMDowNDowMC0wMzowMDwvZGhFbWk+PHRwTkY+MTwvdHBORj48aWREZXN0PjI8L2lkRGVzdD48Y011bkZHPjQyMDkxMDI8L2NNdW5GRz48dHBJbXA+MTwvdHBJbXA+PHRwRW1pcz4xPC90cEVtaXM+PGNEVj4wPC9jRFY+PHRwQW1iPjE8L3RwQW1iPjxmaW5ORmU+MTwvZmluTkZlPjxpbmRGaW5hbD4xPC9pbmRGaW5hbD48aW5kUHJlcz4yPC9pbmRQcmVzPjxpbmRJbnRlcm1lZD4wPC9pbmRJbnRlcm1lZD48cHJvY0VtaT4wPC9wcm9jRW1pPjx2ZXJQcm9jPk1pY3Jvdml4IC4gbmYtZSA0LjAwPC92ZXJQcm9jPjwvaWRlPjxlbWl0PjxDTlBKPjM0MTU4NTA5MDAwMTg5PC9DTlBKPjx4Tm9tZT5DQVBFWklPIEJBTExFVCBNQUtFUlMgRE8gQlJBU0lMIExUREE8L3hOb21lPjxlbmRlckVtaXQ+PHhMZ3I+QWxhbWVkYSBSb2xmIENvbGluPC94TGdyPjxucm8+MTA5IC08L25ybz48eENwbD5TYWxhIDEyLUE8L3hDcGw+PHhCYWlycm8+QW1lcmljYTwveEJhaXJybz48Y011bj40MjA5MTAyPC9jTXVuPjx4TXVuPkpvaW52aWxsZTwveE11bj48VUY+U0M8L1VGPjxDRVA+ODkyMDQwNzA8L0NFUD48Y1BhaXM+MTA1ODwvY1BhaXM+PHhQYWlzPkJSQVNJTDwveFBhaXM+PC9lbmRlckVtaXQ+PElFPjI2MDE0OTA4MDwvSUU+PENSVD4zPC9DUlQ+PC9lbWl0PjxkZXN0PjxDUEY+NDA2MDczNDQ4OTA8L0NQRj48eE5vbWU+QU5BIERFTEJPTkk8L3hOb21lPjxlbmRlckRlc3Q+PHhMZ3I+QXZlbmlkYSBBbGZyZWRvIElnbmFjaW8gTm9ndWVpcmEgUGVuaWRvPC94TGdyPjxucm8+NDcwPC9ucm8+PHhDcGw+QXBhcnRhbWVudG8gODAyPC94Q3BsPjx4QmFpcnJvPj9QYXJxdWUgUmVzaWRlbmNpYWwgQXF1YXJpdXM8L3hCYWlycm8+PGNNdW4+MzU0OTkwNDwvY011bj48eE11bj5TQU8gSk9TRSBET1MgQ0FNUE9TPC94TXVuPjxVRj5TUDwvVUY+PENFUD4xMjI0NjAwMDwvQ0VQPjxjUGFpcz4xMDU4PC9jUGFpcz48eFBhaXM+QlJBU0lMPC94UGFpcz48L2VuZGVyRGVzdD48aW5kSUVEZXN0Pjk8L2luZElFRGVzdD48ZW1haWw+ZGVsYm9uaWFuYUBnbWFpbC5jb208L2VtYWlsPjwvZGVzdD48ZW50cmVnYT48Q1BGPjQwNjA3MzQ0ODkwPC9DUEY+PHhMZ3I+QXZlbmlkYSBBbGZyZWRvIElnbmFjaW8gTm9ndWVpcmEgUGVuaWRvPC94TGdyPjxucm8+NDcwPC9ucm8+PHhDcGw+QXBhcnRhbWVudG8gODAyPC94Q3BsPjx4QmFpcnJvPlBhcnF1ZSBSZXNpZGVuY2lhbCBBcXVhcml1czwveEJhaXJybz48Y011bj4zNTQ5OTA0PC9jTXVuPjx4TXVuPlNhbyBKb3NlIGRvcyBDYW1wb3M8L3hNdW4+PFVGPlNQPC9VRj48Q0VQPjEyMjQ2MDAwPC9DRVA+PGNQYWlzPjEwNTg8L2NQYWlzPjx4UGFpcz5CUkFTSUw8L3hQYWlzPjxmb25lPjEyOTkxMjIyNTc2PC9mb25lPjwvZW50cmVnYT48ZGV0IG5JdGVtPSIxIj48cHJvZD48Y1Byb2Q+ODQxODE3MjQ1PC9jUHJvZD48Y0VBTj44ODYyNzUyMzA4Mjk8L2NFQU4+PHhQcm9kPjIwMzdXLU5VRDhNIC0gSGFuYW1pIENhbnZhcyBOVUQgLSBTYXBhdGlsaGEgTWVpYSBQb250YSBOVURFIDggTTwveFByb2Q+PE5DTT42NDA0MjAwMDwvTkNNPjxDRk9QPjYxMDg8L0NGT1A+PHVDb20+VU48L3VDb20+PHFDb20+MTwvcUNvbT48dlVuQ29tPjE3OS45MDwvdlVuQ29tPjx2UHJvZD4xNzkuOTA8L3ZQcm9kPjxjRUFOVHJpYj44ODYyNzUyMzA4Mjk8L2NFQU5UcmliPjx1VHJpYj5VTjwvdVRyaWI+PHFUcmliPjE8L3FUcmliPjx2VW5UcmliPjE3OS45MDwvdlVuVHJpYj48dkZyZXRlPjguNzI8L3ZGcmV0ZT48dkRlc2M+MTcuOTk8L3ZEZXNjPjxpbmRUb3Q+MTwvaW5kVG90Pjx4UGVkPi0zMTg0PC94UGVkPjwvcHJvZD48aW1wb3N0bz48dlRvdFRyaWI+NTIuMzQ8L3ZUb3RUcmliPjxJQ01TPjxJQ01TMDA+PG9yaWc+Mjwvb3JpZz48Q1NUPjAwPC9DU1Q+PG1vZEJDPjM8L21vZEJDPjx2QkM+MTcwLjYzPC92QkM+PHBJQ01TPjQuMDA8L3BJQ01TPjx2SUNNUz42LjgzPC92SUNNUz48L0lDTVMwMD48L0lDTVM+PElQST48Y0VucT45OTk8L2NFbnE+PElQSVRyaWI+PENTVD41MDwvQ1NUPjx2QkM+MC4wMDwvdkJDPjxwSVBJPjAuMDA8L3BJUEk+PHZJUEk+MC4wMDwvdklQST48L0lQSVRyaWI+PC9JUEk+PFBJUz48UElTQWxpcT48Q1NUPjAxPC9DU1Q+PHZCQz4xNzAuNjM8L3ZCQz48cFBJUz4wLjY1PC9wUElTPjx2UElTPjEuMTE8L3ZQSVM+PC9QSVNBbGlxPjwvUElTPjxDT0ZJTlM+PENPRklOU0FsaXE+PENTVD4wMTwvQ1NUPjx2QkM+MTcwLjYzPC92QkM+PHBDT0ZJTlM+My4wMDwvcENPRklOUz48dkNPRklOUz41LjEyPC92Q09GSU5TPjwvQ09GSU5TQWxpcT48L0NPRklOUz48SUNNU1VGRGVzdD48dkJDVUZEZXN0PjE3MC42MzwvdkJDVUZEZXN0PjxwSUNNU1VGRGVzdD4xOC4wMDwvcElDTVNVRkRlc3Q+PHBJQ01TSW50ZXI+NC4wMDwvcElDTVNJbnRlcj48cElDTVNJbnRlclBhcnQ+MTAwLjAwPC9wSUNNU0ludGVyUGFydD48dklDTVNVRkRlc3Q+MjMuODk8L3ZJQ01TVUZEZXN0Pjx2SUNNU1VGUmVtZXQ+MC4wMDwvdklDTVNVRlJlbWV0PjwvSUNNU1VGRGVzdD48L2ltcG9zdG8+PGluZkFkUHJvZD5Ub3RhbCBhcHJveGltYWRvIGRvcyB0cmlidXRvcyBSUyA1MiwzNCAuIDIwMzdXLU5VRDhNPC9pbmZBZFByb2Q+PC9kZXQ+PGRldCBuSXRlbT0iMiI+PHByb2Q+PGNQcm9kPjc5MDY3NjM0OTwvY1Byb2Q+PGNFQU4+ODg2Mjc1MTMyNDUxPC9jRUFOPjx4UHJvZD4xOTE2LUNBUlNNIC0gVWx0cmEgU29mdCBTZWxmIEtuaXQgV2Fpc3RiYW5kIFRyYW5zaXRpb24gVGlnaHQgQ0FSQU1FTCBTbWFsbC9NZWRpdW08L3hQcm9kPjxOQ00+NjExNTEwMTk8L05DTT48Q0ZPUD42MTA4PC9DRk9QPjx1Q29tPlVOPC91Q29tPjxxQ29tPjE8L3FDb20+PHZVbkNvbT4xMTkuOTA8L3ZVbkNvbT48dlByb2Q+MTE5LjkwPC92UHJvZD48Y0VBTlRyaWI+ODg2Mjc1MTMyNDUxPC9jRUFOVHJpYj48dVRyaWI+VU48L3VUcmliPjxxVHJpYj4xPC9xVHJpYj48dlVuVHJpYj4xMTkuOTA8L3ZVblRyaWI+PHZGcmV0ZT41LjgxPC92RnJldGU+PHZEZXNjPjExLjk5PC92RGVzYz48aW5kVG90PjE8L2luZFRvdD48eFBlZD4tMzE4NDwveFBlZD48L3Byb2Q+PGltcG9zdG8+PHZUb3RUcmliPjM2LjUzPC92VG90VHJpYj48SUNNUz48SUNNUzAwPjxvcmlnPjI8L29yaWc+PENTVD4wMDwvQ1NUPjxtb2RCQz4zPC9tb2RCQz48dkJDPjExMy43MjwvdkJDPjxwSUNNUz40LjAwPC9wSUNNUz48dklDTVM+NC41NTwvdklDTVM+PC9JQ01TMDA+PC9JQ01TPjxJUEk+PGNFbnE+OTk5PC9jRW5xPjxJUElUcmliPjxDU1Q+NTA8L0NTVD48dkJDPjAuMDA8L3ZCQz48cElQST4wLjAwPC9wSVBJPjx2SVBJPjAuMDA8L3ZJUEk+PC9JUElUcmliPjwvSVBJPjxQSVM+PFBJU0FsaXE+PENTVD4wMTwvQ1NUPjx2QkM+MTEzLjcyPC92QkM+PHBQSVM+MC42NTwvcFBJUz48dlBJUz4wLjc0PC92UElTPjwvUElTQWxpcT48L1BJUz48Q09GSU5TPjxDT0ZJTlNBbGlxPjxDU1Q+MDE8L0NTVD48dkJDPjExMy43MjwvdkJDPjxwQ09GSU5TPjMuMDA8L3BDT0ZJTlM+PHZDT0ZJTlM+My40MTwvdkNPRklOUz48L0NPRklOU0FsaXE+PC9DT0ZJTlM+PElDTVNVRkRlc3Q+PHZCQ1VGRGVzdD4xMTMuNzI8L3ZCQ1VGRGVzdD48cElDTVNVRkRlc3Q+MTguMDA8L3BJQ01TVUZEZXN0PjxwSUNNU0ludGVyPjQuMDA8L3BJQ01TSW50ZXI+PHBJQ01TSW50ZXJQYXJ0PjEwMC4wMDwvcElDTVNJbnRlclBhcnQ+PHZJQ01TVUZEZXN0PjE1LjkyPC92SUNNU1VGRGVzdD48dklDTVNVRlJlbWV0PjAuMDA8L3ZJQ01TVUZSZW1ldD48L0lDTVNVRkRlc3Q+PC9pbXBvc3RvPjxpbmZBZFByb2Q+VG90YWwgYXByb3hpbWFkbyBkb3MgdHJpYnV0b3MgUlMgMzYsNTMgLiAxOTE2LUNBUlNNPC9pbmZBZFByb2Q+PC9kZXQ+PGRldCBuSXRlbT0iMyI+PHByb2Q+PGNQcm9kPjg0MTgxNzk3NjwvY1Byb2Q+PGNFQU4+ODg2Mjc1MTg1NjQ4PC9jRUFOPjx4UHJvZD4xOTYxLUJMS1NNIC0gU1RJUlJVUCBUSUdIVCBCTEFDSyBTL008L3hQcm9kPjxOQ00+NjExNTEwMTk8L05DTT48Q0ZPUD42MTA4PC9DRk9QPjx1Q29tPlVOPC91Q29tPjxxQ29tPjE8L3FDb20+PHZVbkNvbT4xNDkuOTA8L3ZVbkNvbT48dlByb2Q+MTQ5LjkwPC92UHJvZD48Y0VBTlRyaWI+ODg2Mjc1MTg1NjQ4PC9jRUFOVHJpYj48dVRyaWI+VU48L3VUcmliPjxxVHJpYj4xPC9xVHJpYj48dlVuVHJpYj4xNDkuOTA8L3ZVblRyaWI+PHZGcmV0ZT43LjI2PC92RnJldGU+PHZEZXNjPjE0Ljk5PC92RGVzYz48aW5kVG90PjE8L2luZFRvdD48eFBlZD4tMzE4NDwveFBlZD48L3Byb2Q+PGltcG9zdG8+PHZUb3RUcmliPjQ1LjY3PC92VG90VHJpYj48SUNNUz48SUNNUzAwPjxvcmlnPjI8L29yaWc+PENTVD4wMDwvQ1NUPjxtb2RCQz4zPC9tb2RCQz48dkJDPjE0Mi4xNzwvdkJDPjxwSUNNUz40LjAwPC9wSUNNUz48dklDTVM+NS42OTwvdklDTVM+PC9JQ01TMDA+PC9JQ01TPjxJUEk+PGNFbnE+OTk5PC9jRW5xPjxJUElUcmliPjxDU1Q+NTA8L0NTVD48dkJDPjAuMDA8L3ZCQz48cElQST4wLjAwPC9wSVBJPjx2SVBJPjAuMDA8L3ZJUEk+PC9JUElUcmliPjwvSVBJPjxQSVM+PFBJU0FsaXE+PENTVD4wMTwvQ1NUPjx2QkM+MTQyLjE3PC92QkM+PHBQSVM+MC42NTwvcFBJUz48dlBJUz4wLjkyPC92UElTPjwvUElTQWxpcT48L1BJUz48Q09GSU5TPjxDT0ZJTlNBbGlxPjxDU1Q+MDE8L0NTVD48dkJDPjE0Mi4xNzwvdkJDPjxwQ09GSU5TPjMuMDA8L3BDT0ZJTlM+PHZDT0ZJTlM+NC4yNzwvdkNPRklOUz48L0NPRklOU0FsaXE+PC9DT0ZJTlM+PElDTVNVRkRlc3Q+PHZCQ1VGRGVzdD4xNDIuMTc8L3ZCQ1VGRGVzdD48cElDTVNVRkRlc3Q+MTguMDA8L3BJQ01TVUZEZXN0PjxwSUNNU0ludGVyPjQuMDA8L3BJQ01TSW50ZXI+PHBJQ01TSW50ZXJQYXJ0PjEwMC4wMDwvcElDTVNJbnRlclBhcnQ+PHZJQ01TVUZEZXN0PjE5LjkwPC92SUNNU1VGRGVzdD48dklDTVNVRlJlbWV0PjAuMDA8L3ZJQ01TVUZSZW1ldD48L0lDTVNVRkRlc3Q+PC9pbXBvc3RvPjxpbmZBZFByb2Q+VG90YWwgYXByb3hpbWFkbyBkb3MgdHJpYnV0b3MgUlMgNDUsNjc8L2luZkFkUHJvZD48L2RldD48dG90YWw+PElDTVNUb3Q+PHZCQz40MjYuNTI8L3ZCQz48dklDTVM+MTcuMDc8L3ZJQ01TPjx2SUNNU0Rlc29uPjAuMDA8L3ZJQ01TRGVzb24+PHZJQ01TVUZEZXN0PjU5LjcxPC92SUNNU1VGRGVzdD48dkZDUD4wLjAwPC92RkNQPjx2QkNTVD4wLjAwPC92QkNTVD48dlNUPjAuMDA8L3ZTVD48dkZDUFNUPjAuMDA8L3ZGQ1BTVD48dkZDUFNUUmV0PjAuMDA8L3ZGQ1BTVFJldD48dlByb2Q+NDQ5LjcwPC92UHJvZD48dkZyZXRlPjIxLjc5PC92RnJldGU+PHZTZWc+MC4wMDwvdlNlZz48dkRlc2M+NDQuOTc8L3ZEZXNjPjx2SUk+MC4wMDwvdklJPjx2SVBJPjAuMDA8L3ZJUEk+PHZJUElEZXZvbD4wLjAwPC92SVBJRGV2b2w+PHZQSVM+Mi43NzwvdlBJUz48dkNPRklOUz4xMi44MDwvdkNPRklOUz48dk91dHJvPjAuMDA8L3ZPdXRybz48dk5GPjQyNi41Mjwvdk5GPjx2VG90VHJpYj4xMzQuNTQ8L3ZUb3RUcmliPjwvSUNNU1RvdD48L3RvdGFsPjx0cmFuc3A+PG1vZEZyZXRlPjA8L21vZEZyZXRlPjx0cmFuc3BvcnRhPjxDTlBKPjE4Mjc3NDkzMDAwMTc3PC9DTlBKPjx4Tm9tZT5MT0dHSSBURUNOT0xPR0lBIExUREEuPC94Tm9tZT48eEVuZGVyPkFMIFNBTlRPUywgMjQwMDwveEVuZGVyPjx4TXVuPlNBTyBQQVVMTzwveE11bj48VUY+U1A8L1VGPjwvdHJhbnNwb3J0YT48dm9sPjxxVm9sPjE8L3FWb2w+PGVzcD5DQUlYQTwvZXNwPjxwZXNvTD4wLjU1MDwvcGVzb0w+PHBlc29CPjAuNTUwPC9wZXNvQj48L3ZvbD48L3RyYW5zcD48cGFnPjxkZXRQYWc+PGluZFBhZz4xPC9pbmRQYWc+PHRQYWc+MDM8L3RQYWc+PHZQYWc+NDI2LjUyPC92UGFnPjxjYXJkPjx0cEludGVncmE+MjwvdHBJbnRlZ3JhPjx0QmFuZD45OTwvdEJhbmQ+PENOUEpSZWNlYj4zNDE1ODUwOTAwMDE4OTwvQ05QSlJlY2ViPjxpZFRlcm1QYWc+MjIxNThfMzQxNTg1MDkwMDAxODlfVkY8L2lkVGVybVBhZz48L2NhcmQ+PC9kZXRQYWc+PC9wYWc+PGluZkFkaWM+PGluZkNwbD4uIC4gUGVkaWRvIE9yaWdpbmFsOiAjMTQyNjEgLiBGdWxmaWxsbWVudCBJRDogIDc4OTQ0MDU2MTE4MzQgLiBGdWxmaWxsbWVudCBOw7ptZXJvOiAgIzE0MjYxLTAyIC4gIC4gTE9KQSBWSVJUVUFMIC0gQ09NUFJBOiAtMzE4NCBUb2tlbjogMjIxNTgxMWNjMTY5MTMxNTEyMjUgLiBOb21lIGRvIFZlbmRlZG9yOiBFLWNvbW1lcmNlIC4gUEVSQ0VOVFVBTCBERVNUSU5POiBbUEVSQ0VOVFVBTF9QQVJUSUxIQV9ERVNUSU5PXSAgVkFMT1IgSUNNUyBERVNUSU5POiBbVkFMT1JfSUNNU19QQVJUSUxIQV9ERVNUSU5PXSAgVkFMT1IgRkNQIERFU1RJTk86IFtWQUxPUl9GQ1BfREVTVElOT10sIC4gVkVOREEgUEFSQSBDT05TVU1JRE9SIEZJTkFMIE7Dg08gQ09OVFJJQlVJTlRFLCBDT05GT1JNRSBFTUVOREEgQ09OU1RJVFVDSU9OQUwgODctMjAxNSAuIFZhbG9yZXMgdG90YWlzIGRvIElDTVMgSW50ZXJlc3RhZHVhbDogIERJRkFMIGRhIFVGIGRlc3Rpbm86IFJTIDU5LDcxMC4gLiBWYWxvciBhcHJveGltYWRvIGRvcyB0cmlidXRvczogMTM0LDU0PC9pbmZDcGw+PC9pbmZBZGljPjxpbmZSZXNwVGVjPjxDTlBKPjU0NTE3NjI4MDAwMTk4PC9DTlBKPjx4Q29udGF0bz5Sb2RyaWdvIEtyZWlzczwveENvbnRhdG8+PGVtYWlsPmRlcHRvLmhvbW9sb2dhY2FvQGxpbnguY29tLmJyPC9lbWFpbD48Zm9uZT41MTk5MjgwMTQ3NDwvZm9uZT48L2luZlJlc3BUZWM+PC9pbmZORmU+PFNpZ25hdHVyZSB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC8wOS94bWxkc2lnIyI+PFNpZ25lZEluZm8+PENhbm9uaWNhbGl6YXRpb25NZXRob2QgQWxnb3JpdGhtPSJodHRwOi8vd3d3LnczLm9yZy9UUi8yMDAxL1JFQy14bWwtYzE0bi0yMDAxMDMxNSIgLz48U2lnbmF0dXJlTWV0aG9kIEFsZ29yaXRobT0iaHR0cDovL3d3dy53My5vcmcvMjAwMC8wOS94bWxkc2lnI3JzYS1zaGExIiAvPjxSZWZlcmVuY2UgVVJJPSIjTkZlNDIyNTEyMzQxNTg1MDkwMDAxODk1NTAwMTAwMDAxNjkxMzEwODIwMjM2NDAiPjxUcmFuc2Zvcm1zPjxUcmFuc2Zvcm0gQWxnb3JpdGhtPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwLzA5L3htbGRzaWcjZW52ZWxvcGVkLXNpZ25hdHVyZSIgLz48VHJhbnNmb3JtIEFsZ29yaXRobT0iaHR0cDovL3d3dy53My5vcmcvVFIvMjAwMS9SRUMteG1sLWMxNG4tMjAwMTAzMTUiIC8+PC9UcmFuc2Zvcm1zPjxEaWdlc3RNZXRob2QgQWxnb3JpdGhtPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwLzA5L3htbGRzaWcjc2hhMSIgLz48RGlnZXN0VmFsdWU+SmhzRVVxdVlRNGVqdU9NRU5KbmhKMWViLzhBPTwvRGlnZXN0VmFsdWU+PC9SZWZlcmVuY2U+PC9TaWduZWRJbmZvPjxTaWduYXR1cmVWYWx1ZT5SZDAvVWlBQk1HMzYyUXBadU5MWU45aTNLbXg1OXBkVmlQTElJMlR2aDBjYTRHZ0wrYlVETmtmdTJKOWtEVDArMXNJNjg5eEs2R0VUN3A5Q2lwM2toYUNpOFAvRUhEaDIvSnk5N2hSNVE5cXVNczRTcWlmaGRidk1tTjRFdGZqMnRzVXR5VVhRcjQvY01wbHpScVlFNUNXREZRWVQzQ05hb3N4c2NMeUFLb1N2anpYS01lQlJoR1doQUorNTJ6dlpLbENGU2hQS2ZFK1hxTWpscjlsejlhSkdiSkczeHlqYkI5VldRc1N2aTAyblBVTUVwcm1sRkNwT0R0d0xzOUdFNmVaZzlEMWVGdVFOeEVtc0o2NjhBTnJLanhYMUkvdmkrMVlZMkhkZE15eDhiQnlhcW5TSUU2VHJhSUg2bjhaVkpzVmpiaTU0Tkw1QzlGV1dlbURrM0E9PTwvU2lnbmF0dXJlVmFsdWU+PEtleUluZm8+PFg1MDlEYXRhPjxYNTA5Q2VydGlmaWNhdGU+TUlJSVZUQ0NCajJnQXdJQkFnSVFYL25JZ2NaaGZGcnhSdEduUnFBcjRUQU5CZ2txaGtpRzl3MEJBUXNGQURDQmdERUxNQWtHQTFVRUJoTUNRbEl4RXpBUkJnTlZCQW9UQ2tsRFVDMUNjbUZ6YVd3eE5qQTBCZ05WQkFzVExWTmxZM0psZEdGeWFXRWdaR0VnVW1WalpXbDBZU0JHWldSbGNtRnNJR1J2SUVKeVlYTnBiQ0F0SUZKR1FqRWtNQ0lHQTFVRUF4TWJRVU1nU1c1emRHbDBkWFJ2SUVabGJtRmpiMjRnVWtaQ0lFY3pNQjRYRFRJMU1Ea3dNakV6TWpRMU9Wb1hEVEkyTURrd01qRXpNalExT1Zvd2dnRW9NUXN3Q1FZRFZRUUdFd0pDVWpFVE1CRUdBMVVFQ2d3S1NVTlFMVUp5WVhOcGJERUxNQWtHQTFVRUNBd0NVME14RWpBUUJnTlZCQWNNQ1VwdmFXNTJhV3hzWlRFV01CUUdBMVVFQ3d3TlVrWkNJR1V0UTA1UVNpQkJNVEVoTUI4R0ExVUVDd3dZUVVNZ1NXNXpkR2wwZFhSdklFWmxibUZqYjI0Z1VrWkNNUmt3RndZRFZRUUxEQkJXYVdSbGIwTnZibVpsY21WdVkybGhNUmN3RlFZRFZRUUxEQTQ0TXpjNU56RTVNVEF3TURFNU1URTJNRFFHQTFVRUN3d3RVMlZqY21WMFlYSnBZU0JrWVNCU1pXTmxhWFJoSUVabFpHVnlZV3dnWkc4Z1FuSmhjMmxzSUMwZ1VrWkNNVHd3T2dZRFZRUURERE5EUVZCRldrbFBJRUpCVEV4RlZDQk5RVXRGVWxNZ1JFOGdRbEpCVTBsTUlFeFVSRUU2TXpReE5UZzFNRGt3TURBeE9Ea3dnZ0VpTUEwR0NTcUdTSWIzRFFFQkFRVUFBNElCRHdBd2dnRUtBb0lCQVFEWEgzenN3cHR1Y2x6cmNveExvclNyNGFOUWZ0djBUeGJaT1lSajBXYlZQbm9ZbzZxVS9BNFowb3p6b0MyMWkwWHRXbkF0VWtvSDJ4TzdqYm5FQyt3SGF1SUE5TGJ1UDd0RTcycXI3UzA1SklmYXljeUxKQlpreDE0VzZsdStvSjVvbmtja1NGL1k3ZW12Y25weEo4aDVRZlZDTVgreEJkeWFoWER1eHR3TVN0WTZibk1kQmxHQUNrbVgwbm5VL0xMdWVJWGpjRmpCRnNpc0I2YjhnTHRPL1NxUXJSRmxWYnJsOWVldnVlenBsd2R3SjhNM2RxRmhFOWNON1djMGdJZTZyZXBXYW9MU0NiT2t2K0loOXpESWw5dFFMaW1PaEpMdTVkcllxSVp2M0NYcnZ5R1piWkN0VFJoNWttOXVSNDRqWXFMNVljZWlESWpnK2ptVDZ5eUJBZ01CQUFHamdnTWVNSUlER2pDQnFBWURWUjBSQklHZ01JR2RvRGdHQldCTUFRTUVvQzhFTFRFMk1EUXhPVGc1TURjeU5Ua3hPVGs1TURNd01EQXdNREF3TURBd01EQXdNREF3TURBd01EQXdNREF3TUtBWEJnVmdUQUVEQXFBT0JBeEZSRlZCVWtSUElGUkpUVTJnR1FZRllFd0JBd09nRUFRT016UXhOVGcxTURrd01EQXhPRG1nRndZRllFd0JBd2VnRGdRTU1EQXdNREF3TURBd01EQXdnUlJsWkhWaGNtUnZRR1p2Y25adExtTnZiUzVpY2pBSkJnTlZIUk1FQWpBQU1COEdBMVVkSXdRWU1CYUFGQ2JIbEQxNmgzNS9TM2lLaHozZ3o3WE9xYkRhTUlHR0JnTlZIU0FFZnpCOU1Ic0dCbUJNQVFJQklqQnhNRzhHQ0NzR0FRVUZCd0lCRm1Ob2RIUndPaTh2YVdOd0xXSnlZWE5wYkM1aFkyWmxibUZqYjI0dVkyOXRMbUp5TDNKbGNHOXphWFJ2Y21sdkwyUndZeTlCUXkxSmJuTjBhWFIxZEc4dFJtVnVZV052YmkxU1JrSXZSRkJEWDBGRFgwbEdaVzVoWTI5dVgxSkdRaTV3WkdZd2djb0dBMVVkSHdTQndqQ0J2ekJlb0Z5Z1dvWllhSFIwY0RvdkwybGpjQzFpY21GemFXd3VZV05tWlc1aFkyOXVMbU52YlM1aWNpOXlaWEJ2YzJsMGIzSnBieTlzWTNJdlFVTkpibk4wYVhSMWRHOUdaVzVoWTI5dVVrWkNSek12VEdGMFpYTjBRMUpNTG1OeWJEQmRvRnVnV1laWGFIUjBjRG92TDJsamNDMWljbUZ6YVd3dWIzVjBjbUZzWTNJdVkyOXRMbUp5TDNKbGNHOXphWFJ2Y21sdkwyeGpjaTlCUTBsdWMzUnBkSFYwYjBabGJtRmpiMjVTUmtKSE15OU1ZWFJsYzNSRFVrd3VZM0pzTUE0R0ExVWREd0VCL3dRRUF3SUY0REFkQmdOVkhTVUVGakFVQmdnckJnRUZCUWNEQWdZSUt3WUJCUVVIQXdRd2dic0dDQ3NHQVFVRkJ3RUJCSUd1TUlHck1HWUdDQ3NHQVFVRkJ6QUNobHBvZEhSd09pOHZhV053TFdKeVlYTnBiQzVoWTJabGJtRmpiMjR1WTI5dExtSnlMM0psY0c5emFYUnZjbWx2TDJObGNuUnBabWxqWVdSdmN5OUJRMTlKYm5OMGFYUjFkRzlmUm1WdVlXTnZibDlTUmtKSE15NXdOMk13UVFZSUt3WUJCUVVITUFHR05XaDBkSEE2THk5dlkzTndMV0ZqTFdsdWMzUnBkSFYwYnkxbVpXNWhZMjl1TFhKbVlpNWpaWEowYVhOcFoyNHVZMjl0TG1KeU1BMEdDU3FHU0liM0RRRUJDd1VBQTRJQ0FRQS9tNGdtTmF5b05mWmJVUE1EYURUelc5NnhGcUVJeXVGRkE1TjRMeFFPRnFrb05jclZQV1NEQnpCeWpCVHEvY0xNeWNUS1FSemVYdDM2YWNkejM0dmpTU3RHLzY1R0VJNG1LdXE2a0ZXbEh3U1JkNDFCMlpBME9PTWtUMTFiZlBQRlcxdTVkWHhVajMwVXhEd0hId3N1TkowRmJvWkRBYktPcGVmcEJpbTE3b05xSnZybmtMRnJ3QlNHYVhzZCt2Tk13T1R4aEkyZERDM29Yc0dGOWUwM2VVY3FFRnZPNmpsVkNZUVRkK3oyMm02cW5FZmplcDBOZGYybEM4bUsrN0hkQnVpa2NodERSWTJFWFlrVUtNQTRBc01tcSt5Tks1ZHVTcHkzSVFVbEZ1cURHWExVcTB6QXE0NDg0UWVyb0pualgwSVlYcEI4cEs3bGtxTUpENHlEcHAvQlplR3M1MEhEN0RJNXdpR2wvdS9FdDM2ZENNYTQyaVl3Wm8xR3lCck53ZUlpajIrL2gxSGU2WTVXdU0xQWpEVzFic2J5UWlCWWhLYWFpa3g1VVVpNU9TblJwdXpGSTZ6aE5HaWlTbFBEQlpFb1BadkRNa0tPNkloS1p2ekE4OCs0cENVWjkwU3ZNOGFLQS9BR2dNR2RBbGd0QlUxVDJocVRETkZReWFmWG9TeUhOeEN6NEhldGo5MXliNzJKOW0wMmgyd0c1U2hnUHZQbks4MXN6OHlIeFgwdmpySEozSmN6MnlmeHFFdkxyL2JkMVlMbVlpZkk3WEdKMEd1RVJPeUY4aW5mZ1lqaVRMb0wzMi9WZUNocExHc2lIeEZmb1lockU1bCtWSkc4VHB6R1hsL3VNZzVWN3hXSkQxN04rTElVVmhZb1dIaU9KZlI5S2JpNWV3PT08L1g1MDlDZXJ0aWZpY2F0ZT48L1g1MDlEYXRhPjwvS2V5SW5mbz48L1NpZ25hdHVyZT48L05GZT48cHJvdE5GZSB2ZXJzYW89IjQuMDAiPjxpbmZQcm90Pjx0cEFtYj4xPC90cEFtYj48dmVyQXBsaWM+U1ZSUzI1MTIwMzE0NDZEUjwvdmVyQXBsaWM+PGNoTkZlPjQyMjUxMjM0MTU4NTA5MDAwMTg5NTUwMDEwMDAwMTY5MTMxMDgyMDIzNjQwPC9jaE5GZT48ZGhSZWNidG8+MjAyNS0xMi0xNVQxMDowNDo0OS0wMzowMDwvZGhSZWNidG8+PG5Qcm90PjI0MjI1MDUwODQ4MjA2MDwvblByb3Q+PGRpZ1ZhbD5KaHNFVXF1WVE0ZWp1T01FTkpuaEoxZWIvOEE9PC9kaWdWYWw+PGNTdGF0PjEwMDwvY1N0YXQ+PHhNb3Rpdm8+QXV0b3JpemFkbyBvIHVzbyBkYSBORi1lPC94TW90aXZvPjwvaW5mUHJvdD48L3Byb3RORmU+PC9uZmVQcm9jPg=="
+            }
+        ],
+        "resend": [],
+        "wms": {
+            "weight": "1",
+            "weightm3": "0",
+            "volumes": "1"
+        }
+    }
+}

@@ -1,0 +1,33 @@
+# Visual Studio / .NET
+.vs/
+bin/
+obj/
+*.user
+*.suo
+*.userprefs
+*.ide
+
+# Rider/JetBrains
+.idea/
+
+# Build output
+publish/
+
+# Secrets and local config
+appsettings.Development.json
+appsettings.Local.json
+*.Secrets.json
+
+# NuGet
+*.nupkg
+packages/
+
+# Test results
+TestResults/
+
+# VS Code
+.vscode/
+
+# OS
+.DS_Store
+Thumbs.db	
