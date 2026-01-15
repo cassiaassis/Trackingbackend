@@ -1,4 +1,4 @@
-using Microsoft.AspNetCore.Authentication.JwtBearer;
+ï»¿using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
@@ -18,6 +18,7 @@ builder.Services.AddDbContext<AppDbContext>(opt =>
 
 // DI
 builder.Services.AddScoped<IRastreioRepository, RastreioRepository>();
+builder.Services.AddScoped<IRastreioStatusRepository, RastreioStatusRepository>(); // âœ… NOVO
 builder.Services.AddScoped<IClienteService, ClienteService>();
 
 // HttpClient TPL (typed) + Polly
@@ -49,7 +50,7 @@ builder.Services.AddSwaggerGen(options =>
     {
         Title = "Tracking API",
         Version = "v1",
-        Description = "API de rastreamento de pedidos com integração TPL",
+        Description = "API de rastreamento de pedidos com integraÃ§Ã£o TPL",
         Contact = new OpenApiContact
         {
             Name = "Suporte Tracking",
@@ -57,7 +58,6 @@ builder.Services.AddSwaggerGen(options =>
         }
     });
 
-    // Configuração de segurança JWT
     options.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
     {
         Name = "Authorization",
@@ -82,12 +82,6 @@ builder.Services.AddSwaggerGen(options =>
             Array.Empty<string>()
         }
     });
-
-    // Adiciona comentários XML (opcional)
-    // var xmlFile = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
-    // var xmlPath = Path.Combine(AppContext.BaseDirectory, xmlFile);
-    // if (File.Exists(xmlPath))
-    //     options.IncludeXmlComments(xmlPath);
 });
 
 // ===== JWT =====
@@ -100,7 +94,7 @@ builder.Services
     .AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     .AddJwtBearer(opt =>
     {
-        opt.RequireHttpsMetadata = true;
+        opt.RequireHttpsMetadata = false;
         opt.SaveToken = true;
         opt.TokenValidationParameters = new TokenValidationParameters
         {
@@ -125,14 +119,14 @@ app.UseSwaggerUI(options =>
 {
     options.SwaggerEndpoint("/swagger/v1/swagger.json", "Tracking API v1");
     options.RoutePrefix = "swagger";
-    options.DocumentTitle = "Tracking API - Documentação";
+    options.DocumentTitle = "Tracking API - DocumentaÃ§Ã£o";
     options.DefaultModelsExpandDepth(2);
     options.DefaultModelExpandDepth(2);
     options.DocExpansion(Swashbuckle.AspNetCore.SwaggerUI.DocExpansion.List);
     options.DisplayRequestDuration();
 });
 
-app.UseHttpsRedirection();
+// app.UseHttpsRedirection(); // Comentado para HTTP
 app.UseAuthentication();
 app.UseAuthorization();
 

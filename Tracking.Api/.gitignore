@@ -11,7 +11,7 @@ obj/
 .idea/
 
 # Build output
-publish/
+publish/x
 
 # Secrets and local config
 appsettings.Development.json
@@ -31,3 +31,20 @@ TestResults/
 # OS
 .DS_Store
 Thumbs.db	
+
+## User-specific files
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+
+## Secrets - NÃO COMMITAR
+appsettings.Production.json
+secrets.json
+*.secrets.json
+
+## Build results
+bin/
+obj/
+[Dd]ebug/
+[Rr]elease/
