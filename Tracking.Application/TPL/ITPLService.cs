@@ -23,11 +23,6 @@ namespace Tracking.Application
 
     public interface ITplService
     {
-        Task<TplRastreioResult> ObterDetalhePedidoAsync(
-            string orderNumber,
-            int? orderId,
-            CancellationToken ct = default);
-
         Task<(TplOrderInfo? info, List<TplShippingEvent>? shippingevents, int code, string? message)> ObterDadosBrutosAsync(
             string orderNumber,
             int? orderId,

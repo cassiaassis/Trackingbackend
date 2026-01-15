@@ -3,9 +3,9 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text.Json;
+using System.Threading;
 using System.Threading.Tasks;
 using Tracking.Application.Dto;
-using Tracking.Application.Mappers;
 using Tracking.Infrastructure.Repositories;
 
 namespace Tracking.Application.Services
@@ -14,11 +14,13 @@ namespace Tracking.Application.Services
     {
         private readonly IRastreioRepository _repo;
         private readonly ITplService _tpl;
+        private readonly IRastreioStatusRepository _statusRepo;
 
-        public ClienteService(IRastreioRepository repo, ITplService tpl)
+        public ClienteService(IRastreioRepository repo, ITplService tpl, IRastreioStatusRepository statusRepo)
         {
             _repo = repo;
             _tpl = tpl;
+            _statusRepo = statusRepo;
         }
 
         public async Task<RastreioResponse?> ConsultarAsync(string identificador, CancellationToken ct = default)
@@ -45,33 +47,43 @@ namespace Tracking.Application.Services
             if (string.IsNullOrWhiteSpace(codigo))
                 return baseResponse;
 
-            var tpl = await _tpl.ObterDetalhePedidoAsync(codigo!, orderId, ct);
+            var (info, shippingevents, code, message) = await _tpl.ObterDadosBrutosAsync(codigo!, orderId, ct);
 
-            var eventos = tpl.Eventos
-                .OrderByDescending(e => e.Data)
-                .Select(e => new EventoDto(
-                    id: e.Id ?? Guid.NewGuid().ToString("N"),
-                    date: e.Data,
-                    name: e.Titulo ?? "Atualização",
-                    description: e.Descricao ?? string.Empty
-                ))
+            var eventos = new List<EventoDto>();
+            foreach (var e in shippingevents ?? new List<TplShippingEvent>())
+            {
+                if (!e.internalCode.HasValue) continue;
+
+                var status = await _statusRepo.BuscarPorInternalCodeAsync(e.internalCode.Value, ct);
+                if (status is null) continue;
+
+                eventos.Add(new EventoDto(
+                    id: status.IdTimeline.ToString(),
+                    date: DateTime.TryParse(e.date, out var dt) ? dt : DateTime.UtcNow,
+                    name: status.StatusTimeline ?? "Atualização",
+                    description: status.DsTimeline ?? string.Empty
+                ));
+            }
+
+            // Agrupar por id_timeline e pegar o mais recente de cada grupo
+            eventos = eventos
+                .GroupBy(e => e.id)
+                .Select(g => g.OrderByDescending(x => x.date).First())
+                .OrderByDescending(e => e.date)
                 .ToList();
 
             return baseResponse with
             {
-                transportadora = new TransportadoraDto(
-                    tpl.TransportadoraApelido ?? "TPL",
-                    tpl.TransportadoraTracker ?? codigo!),
+                transportadora = new TransportadoraDto("TPL", codigo!),
                 eventos = eventos
             };
         }
 
         public async Task<RastreioTplResponse?> ConsultarTplAsync(string identificador, CancellationToken ct = default)
         {
-            // 🎭 MOCK: CPFs especiais para testes no frontend
             var cpfLimpo = new string(identificador.Where(char.IsDigit).ToArray());
 
-            // Mock 3: CPF não localizado (404) - NÃO MEXER
+            // Mock 3: CPF não localizado (404)
             if (cpfLimpo == "22676652801")
             {
                 return new RastreioTplResponse(
@@ -84,26 +96,13 @@ namespace Tracking.Application.Services
                         prediction: string.Empty,
                         iderp: null
                     ),
-                    shippingevents: new List<ShippingEventDto>
-                    {
-                        new ShippingEventDto(
-                            code: string.Empty,
-                            dscode: string.Empty,
-                            message: string.Empty,
-                            detalhe: string.Empty,
-                            complement: null,
-                            dtshipping: string.Empty,
-                            internalcode: null
-                        )
-                    }
+                    shippingevents: new List<ShippingEventDto>()
                 );
             }
 
             // Mock 2: Em preparação (cd_rastreio NULL)
             if (cpfLimpo == "12676652800")
             {
-                var statusPrep = StatusTimelineMapper.ObterStatusPreparacao();
-
                 return new RastreioTplResponse(
                     code: 200,
                     message: "OK",
@@ -117,13 +116,10 @@ namespace Tracking.Application.Services
                     shippingevents: new List<ShippingEventDto>
                     {
                         new ShippingEventDto(
-                            code: statusPrep.CodTimeline,
-                            dscode: statusPrep.StatusTimeline,
-                            message: statusPrep.DsTimeline,
-                            detalhe: string.Empty,
-                            complement: null,
-                            dtshipping: DateTime.UtcNow.ToString("yyyy-MM-ddTHH:mm:ss"),
-                            internalcode: 5
+                            code: "1",
+                            dscode: "Em preparação",
+                            message: "Estamos preparando seu presente com carinho.",
+                            dtshipping: DateTime.UtcNow.ToString("yyyy-MM-ddTHH:mm:ss")
                         )
                     }
                 );
@@ -135,10 +131,9 @@ namespace Tracking.Application.Services
                 return CarregarMockTplJson();
             }
 
-            // 🔄 Fluxo normal (não é mock)
+            // Fluxo normal (não é mock)
             var data = await _repo.BuscarPorCpfOuEmailAsync(identificador, ct);
 
-            // CPF não encontrado (404) - NÃO MEXER
             if (data is null)
             {
                 return new RastreioTplResponse(
@@ -151,18 +146,7 @@ namespace Tracking.Application.Services
                         prediction: string.Empty,
                         iderp: null
                     ),
-                    shippingevents: new List<ShippingEventDto>
-                    {
-                        new ShippingEventDto(
-                            code: string.Empty,
-                            dscode: string.Empty,
-                            message: string.Empty,
-                            detalhe: string.Empty,
-                            complement: null,
-                            dtshipping: string.Empty,
-                            internalcode: null
-                        )
-                    }
+                    shippingevents: new List<ShippingEventDto>()
                 );
             }
 
@@ -171,10 +155,9 @@ namespace Tracking.Application.Services
             var codigo = rastreio?.CodigoRastreio;
             var orderId = resgate.IdResgate;
 
-            // Cenário 2: cd_rastreio é NULL (Em preparação)
+            // cd_rastreio é NULL (Em preparação)
             if (string.IsNullOrWhiteSpace(codigo))
             {
-                var statusPrep = StatusTimelineMapper.ObterStatusPreparacao();
                 var dtRegistro = rastreio?.DtRegistro?.ToString("yyyy-MM-ddTHH:mm:ss")
                     ?? DateTime.UtcNow.ToString("yyyy-MM-ddTHH:mm:ss");
 
@@ -191,44 +174,44 @@ namespace Tracking.Application.Services
                     shippingevents: new List<ShippingEventDto>
                     {
                         new ShippingEventDto(
-                            code: statusPrep.CodTimeline,
-                            dscode: statusPrep.StatusTimeline,
-                            message: statusPrep.DsTimeline,
-                            detalhe: string.Empty,
-                            complement: null,
-                            dtshipping: dtRegistro,
-                            internalcode: 5
+                            code: "1",
+                            dscode: "Em preparação",
+                            message: "Estamos preparando seu pedido",
+                            dtshipping: dtRegistro
                         )
                     }
                 );
             }
 
-            // Cenário 1: cd_rastreio existe - Aplicar DE/PARA + Filtrar não mapeados
+            // cd_rastreio existe - Buscar na tabela TRKG_RASTREIO_STATUS
             var (info, shippingevents, code, message) = await _tpl.ObterDadosBrutosAsync(codigo!, orderId, ct);
 
             var infoDto = info is not null
                 ? new OrderInfoDto(info.id, info.number, info.date, info.prediction, info.iderp)
                 : null;
 
-            // ✅ Filtrar apenas eventos mapeados + Remover duplicados por internalCode
-            var eventosDto = (shippingevents ?? new List<TplShippingEvent>())
-                .Where(e => StatusTimelineMapper.EstaMapeado(e.internalCode)) // ✅ FILTRAR NÃO MAPEADOS
-                .GroupBy(e => e.internalCode)
-                .Select(g => g.First())
-                .Select(e =>
-                {
-                    var mapped = StatusTimelineMapper.MapearPorInternalCode(e.internalCode)!; // ! porque já foi validado no Where
+            var eventosDto = new List<ShippingEventDto>();
 
-                    return new ShippingEventDto(
-                        code: mapped.CodTimeline,
-                        dscode: mapped.StatusTimeline,
-                        message: mapped.DsTimeline,
-                        detalhe: e.info,
-                        complement: e.complement,
-                        dtshipping: e.date,
-                        internalcode: e.internalCode
-                    );
-                })
+            foreach (var e in shippingevents ?? new List<TplShippingEvent>())
+            {
+                if (!e.internalCode.HasValue) continue;
+
+                var status = await _statusRepo.BuscarPorInternalCodeAsync(e.internalCode.Value, ct);
+                if (status is null) continue;
+
+                eventosDto.Add(new ShippingEventDto(
+                    code: status.IdTimeline.ToString(),
+                    dscode: status.StatusTimeline,
+                    message: status.DsTimeline,
+                    dtshipping: e.date
+                ));
+            }
+
+            // Agrupar por id_timeline e mostrar o mais recente de cada grupo
+            eventosDto = eventosDto
+                .OrderByDescending(e => DateTime.TryParse(e.dtshipping, out var dt) ? dt : DateTime.MinValue)
+                .GroupBy(e => e.code)
+                .Select(g => g.First())
                 .ToList();
 
             return new RastreioTplResponse(code, message, infoDto, eventosDto);
@@ -236,98 +219,27 @@ namespace Tracking.Application.Services
 
         private RastreioTplResponse CarregarMockTplJson()
         {
-            try
-            {
-                var jsonPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Services", "JSON_TPL.json");
-
-                if (!File.Exists(jsonPath))
+            // Mock simplificado, sem uso de Mapper
+            return new RastreioTplResponse(
+                code: 200,
+                message: "OK (Mock Fallback)",
+                info: new OrderInfoDto(
+                    id: "8064892",
+                    number: "ENX8064892-1",
+                    date: "10/01/2026",
+                    prediction: "15/01/2026",
+                    iderp: "PED-2026-001"
+                ),
+                shippingevents: new List<ShippingEventDto>
                 {
-                    jsonPath = @"D:\2LOG\Projetos\TrackingBackend\Tracking.Application\Services\JSON_TPL.json";
+                    new ShippingEventDto(
+                        code: "7",
+                        dscode: "Entregue",
+                        message: "Seu pedido foi entregue com sucesso!",
+                        dtshipping: "2026-01-15T14:30:00"
+                    )
                 }
-
-                if (!File.Exists(jsonPath))
-                {
-                    throw new FileNotFoundException($"Arquivo JSON mock não encontrado: {jsonPath}");
-                }
-
-                var jsonContent = File.ReadAllText(jsonPath);
-                var mockData = JsonSerializer.Deserialize<MockTplResponse>(jsonContent, new JsonSerializerOptions
-                {
-                    PropertyNameCaseInsensitive = true
-                });
-
-                if (mockData?.order == null)
-                {
-                    throw new InvalidOperationException("JSON mock inválido");
-                }
-
-                var order = mockData.order;
-                var infoDto = order.info != null
-                    ? new OrderInfoDto(
-                        order.info.id,
-                        order.info.number,
-                        order.info.date,
-                        order.info.prediction,
-                        order.info.iderp)
-                    : null;
-
-                // ✅ Filtrar apenas eventos mapeados + Remover duplicados por internalCode
-                var eventosDto = (order.shippingevents ?? Array.Empty<MockShippingEvent>())
-                    .Where(e => StatusTimelineMapper.EstaMapeado(e.internalCode)) // ✅ FILTRAR NÃO MAPEADOS
-                    .GroupBy(e => e.internalCode)
-                    .Select(g => g.First())
-                    .Select(e =>
-                    {
-                        var mapped = StatusTimelineMapper.MapearPorInternalCode(e.internalCode)!;
-
-                        return new ShippingEventDto(
-                            code: mapped.CodTimeline,
-                            dscode: mapped.StatusTimeline,
-                            message: mapped.DsTimeline,
-                            detalhe: e.info,
-                            complement: e.complement,
-                            dtshipping: e.date,
-                            internalcode: e.internalCode
-                        );
-                    })
-                    .ToList();
-
-                return new RastreioTplResponse(
-                    mockData.code,
-                    mockData.message,
-                    infoDto,
-                    eventosDto
-                );
-            }
-            catch (Exception)
-            {
-                // Fallback hardcoded com mapeamento
-                var statusEntregue = StatusTimelineMapper.MapearPorInternalCode(90);
-
-                return new RastreioTplResponse(
-                    code: 200,
-                    message: "OK (Mock Fallback)",
-                    info: new OrderInfoDto(
-                        id: "8064892",
-                        number: "ENX8064892-1",
-                        date: "10/01/2026",
-                        prediction: "15/01/2026",
-                        iderp: "PED-2026-001"
-                    ),
-                    shippingevents: new List<ShippingEventDto>
-                    {
-                        new ShippingEventDto(
-                            code: statusEntregue?.CodTimeline ?? "7",
-                            dscode: statusEntregue?.StatusTimeline ?? "Entregue",
-                            message: statusEntregue?.DsTimeline ?? "Seu pedido foi entregue com sucesso!",
-                            detalhe: "Objeto entregue ao destinatário",
-                            complement: "Entregue para JOANNA",
-                            dtshipping: "2026-01-15T14:30:00",
-                            internalcode: 90
-                        )
-                    }
-                );
-            }
+            );
         }
 
         // Classes auxiliares para deserializar o JSON mock

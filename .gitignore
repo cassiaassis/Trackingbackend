@@ -22,10 +22,13 @@ bld/
 # Visual Studio cache/options
 .vs/
 
-# Secrets
-appsettings.Development.json
+## Secrets - NÃO COMMITAR
+appsettings.Production.json
 appsettings.*.json
 !appsettings.json
+!appsettings.Development.json
+secrets.json
+*.secrets.json
 
 # NuGet
 *.nupkg
@@ -42,3 +45,19 @@ appsettings.*.json
 project.lock.json
 project.fragment.lock.json
 artifacts/
+
+
+## Build results
+bin/
+obj/
+[Dd]ebug/
+[Rr]elease/
+[Pp]ublish/
+
+## Visual Studio
+.vs/
+*.rsuser
+*.suo
+*.user
+*.userosscache
+*.sln.docstates

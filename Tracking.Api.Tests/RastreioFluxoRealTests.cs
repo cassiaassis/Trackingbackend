@@ -271,10 +271,18 @@ namespace Tracking.Api.Tests
 
             using var http = new HttpClient();
             var auth = await ObterAuthAsync(http);
-            
+
             try
             {
                 var detail = await ObterOrderDetailAsync(http, auth, cd);
+
+                // Serializa o JSON de retorno da aplicação
+                var json = JsonSerializer.Serialize(detail, new JsonSerializerOptions { WriteIndented = true });
+                _output.WriteLine("=== JSON de retorno da aplicação ===");
+                _output.WriteLine(json);
+                _output.WriteLine("====================================");
+
+
                 detail.order!.shippingevents.Should().NotBeNull();
                 detail.order!.shippingevents!.Length.Should().BeGreaterThan(0);
             }

@@ -18,6 +18,7 @@ public class AppDbContext : DbContext
     public DbSet<Campanha> Campanhas => Set<Campanha>();
     public DbSet<ResgateBrinde> Resgates => Set<ResgateBrinde>();
     public DbSet<RastreioResgate> Rastreios => Set<RastreioResgate>();
+    public DbSet<RastreioStatus> RastreiosStatus => Set<RastreioStatus>(); // ✅ NOVO
 
     protected override void OnModelCreating(ModelBuilder b)
     {
@@ -110,6 +111,24 @@ public class AppDbContext : DbContext
             e.Property(x => x.CodigoRastreio).HasColumnName("cd_rastreio").HasMaxLength(50);
             e.Property(x => x.DtRegistro).HasColumnName("dt_registro");
             e.Property(x => x.DtAtualizacao).HasColumnName("dt_atualizacao");
+        });
+
+        // ========= TRKG_RASTREIO_STATUS ========= ✅ NOVO
+        b.Entity<RastreioStatus>(e =>
+        {
+            e.ToTable("TRKG_RASTREIO_STATUS");
+            e.HasKey(x => x.Id);
+
+            e.Property(x => x.Id).HasColumnName("id");
+            e.Property(x => x.InternalCodeTpl).HasColumnName("internalcode_TPL");
+            e.Property(x => x.IdTimeline).HasColumnName("id_timeline");
+            e.Property(x => x.StatusTimeline).HasColumnName("status_timeline").HasMaxLength(200);
+            e.Property(x => x.DsTimeline).HasColumnName("ds_timeline").HasMaxLength(200);
+            e.Property(x => x.DtRegistro).HasColumnName("dt_registro");
+            e.Property(x => x.DtAtualizacao).HasColumnName("dt_atualizacao");
+
+            // Índice para otimizar busca por internalcode_TPL
+            e.HasIndex(x => x.InternalCodeTpl).HasDatabaseName("IX_TRKG_RASTREIO_STATUS_InternalCodeTPL");
         });
     }
 }
