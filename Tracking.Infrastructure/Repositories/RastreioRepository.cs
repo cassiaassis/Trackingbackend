@@ -26,8 +26,8 @@ namespace Tracking.Infrastructure.Repositories
             var where = isCpf ? "c.cpf = @identificador" : "LOWER(LTRIM(RTRIM(c.email))) COLLATE Latin1_General_CI_AI = @identificador";
 
             var sql = $@"
-                        select 
-                            c.cpf, c.email, a.cd_rastreio, a.prediction, d.id_timeline, d.status_timeline, d.ds_timeline, b.date as final
+                        select distinct
+                            c.cpf, c.email, a.cd_rastreio, a.prediction, d.id_timeline, d.status_timeline, d.ds_timeline, cast(b.dtshipping as date)  as final
                         from TRKG_TPLOrderInfo a (nolock)
                         inner join TRKG_TplShippingEvent b (nolock)
                             on a.id = b.info_id
@@ -36,7 +36,7 @@ namespace Tracking.Infrastructure.Repositories
                         left outer join DBO.TRKG_RASTREIO_STATUS d (nolock)
                             on b.internalcode = d.internalcode_TPL
                         where {where}
-                        group by c.cpf, c.email, a.cd_rastreio, a.prediction, d.id_timeline, d.status_timeline, d.ds_timeline, b.date
+                        group by c.cpf, c.email, a.cd_rastreio, a.prediction, d.id_timeline, d.status_timeline, d.ds_timeline, b.dtshipping
                         order by d.id_timeline desc
                     ";
 

@@ -41,7 +41,7 @@ namespace Tracking.Application
                 //BUSCA O TOKEN
                 var auth = await EnsureAuthAsync(ct);
 
-                // 1) Tenta por order.number (cd_rastreio)
+                // 1) Buscar por order.number (cd_rastreio)
                 var resNumber = await PostOrderDetailAsync(auth, number: orderNumber, id: null, ct);
                 if (resNumber.success && resNumber.response?.order is not null)
                 {

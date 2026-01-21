@@ -215,7 +215,7 @@ namespace Tracking.Api.Tests
 
             insertInfoCmd.Parameters.AddWithValue("@info", (object?)info.id ?? DBNull.Value);
             insertInfoCmd.Parameters.AddWithValue("@cd_rastreio", (object?)info.number ?? DBNull.Value);
-            insertInfoCmd.Parameters.Add("@date", SqlDbType.Date).Value = DateTime.TryParse(info.date, out var dt) ? dt : DBNull.Value;
+            insertInfoCmd.Parameters.Add("@date", SqlDbType.DateTime).Value = DateTime.TryParse(info.date, out var dt) ? dt : DBNull.Value;
             insertInfoCmd.Parameters.Add("@prediction", SqlDbType.Date).Value = DateTime.TryParse(info.prediction, out var pred) ? pred : DBNull.Value;
 
             var result = await insertInfoCmd.ExecuteScalarAsync();
@@ -235,8 +235,8 @@ namespace Tracking.Api.Tests
                 insertEventCmd.Parameters.AddWithValue("@code", (object?)evt.code ?? DBNull.Value);
                 insertEventCmd.Parameters.AddWithValue("@info", (object?)evt.info ?? DBNull.Value);
                 insertEventCmd.Parameters.AddWithValue("@complement", (object?)evt.complement ?? DBNull.Value);
-                insertEventCmd.Parameters.Add("@date", SqlDbType.Date).Value = DateTime.TryParse(evt.date, out var dt_) ? dt : DBNull.Value;
-                insertEventCmd.Parameters.Add("@final", SqlDbType.Date).Value = DateTime.TryParse(evt.final, out var dtFinal) ? dtFinal : DBNull.Value;
+                insertEventCmd.Parameters.Add("@date", SqlDbType.DateTime).Value = DateTime.TryParse(evt.date, out var dt_) ? dt : DBNull.Value;
+                insertEventCmd.Parameters.Add("@final", SqlDbType.DateTime).Value = DateTime.TryParse(evt.final, out var dtFinal) ? dtFinal : DBNull.Value;
                 insertEventCmd.Parameters.AddWithValue("@volume", (object?)evt.volume ?? DBNull.Value);
                 insertEventCmd.Parameters.AddWithValue("@internalcode", (object?)evt.internalCode ?? DBNull.Value);
 
@@ -244,6 +244,83 @@ namespace Tracking.Api.Tests
             }
         }
 
+        private async Task AtualizarDadosTPLAsync(SqlConnection conn, string cpf, string cd_rastreio, TplOrderInfo info, List<Tracking.Application.TplShippingEvent> shippingevents)
+        {
+            // Busca o info_id do cd_rastreio
+            var getInfoIdCmd = new SqlCommand(
+                "SELECT id FROM TRKG_TPLOrderInfo (NOLOCK) WHERE cd_rastreio = @cd_rastreio",
+                conn);
+            getInfoIdCmd.Parameters.AddWithValue("@cd_rastreio", cd_rastreio);
+            var info_id_obj = await getInfoIdCmd.ExecuteScalarAsync();
+            if (info_id_obj == null)
+                throw new InvalidOperationException($"Nenhum info_id encontrado para cd_rastreio {cd_rastreio}");
+            var info_id = Convert.ToInt32(info_id_obj);
+
+            foreach (var evt in shippingevents)
+            {
+                // Busca evento existente pelo internalcode
+                var buscaCmd = new SqlCommand(@"
+                SELECT a.id, b.info_id, b.code, b.info, b.complement, b.date, b.final, b.volume, b.internalcode
+                FROM TRKG_TPLOrderInfo a (NOLOCK)
+                INNER JOIN TRKG_TplShippingEvent b (NOLOCK) ON a.id = b.info_id
+                WHERE a.cd_rastreio = @cd_rastreio AND b.internalcode = @internalcode
+                ORDER BY a.cd_rastreio", conn);
+
+                buscaCmd.Parameters.AddWithValue("@cd_rastreio", cd_rastreio);
+                buscaCmd.Parameters.AddWithValue("@internalcode", (object?)evt.internalCode ?? DBNull.Value);
+
+                using var reader = await buscaCmd.ExecuteReaderAsync();
+                if (await reader.ReadAsync() && !reader.IsDBNull(8)) // internalcode existe
+                {
+                    reader.Close(); // Fechar antes de novo comando
+
+                    // Atualiza evento existente
+                    var updateCmd = new SqlCommand(@"
+                    UPDATE TRKG_TplShippingEvent
+                    SET code = @code, info = @info, complement = @complement, date = @date, final = @final, volume = @volume, dt_atualizacao = GETDATE()
+                    WHERE info_id = @info_id AND internalcode = @internalcode", conn);
+
+                    updateCmd.Parameters.AddWithValue("@code", (object?)evt.code ?? DBNull.Value);
+                    updateCmd.Parameters.AddWithValue("@info", (object?)evt.info ?? DBNull.Value);
+                    updateCmd.Parameters.AddWithValue("@complement", (object?)evt.complement ?? DBNull.Value);
+                    updateCmd.Parameters.Add("@date", SqlDbType.DateTime).Value = DateTime.TryParse(evt.date, out var dt) ? dt : DBNull.Value;
+                    updateCmd.Parameters.Add("@final", SqlDbType.DateTime).Value = DateTime.TryParse(evt.final, out var dtFinal) ? dtFinal : DBNull.Value;
+                    updateCmd.Parameters.AddWithValue("@volume", (object?)evt.volume ?? DBNull.Value);
+                    updateCmd.Parameters.AddWithValue("@info_id", info_id);
+                    updateCmd.Parameters.AddWithValue("@internalcode", (object?)evt.internalCode ?? DBNull.Value);
+
+                    await updateCmd.ExecuteNonQueryAsync();
+                }
+                else
+                {
+                    reader.Close(); // Fechar antes de novo comando
+
+                    var internalCode_ = evt.internalCode?.ToString();
+                    // Insere novo evento
+                    var insertCmd = new SqlCommand(@"
+                    INSERT INTO TRKG_TplShippingEvent (info_id, code, info, complement, date, final, volume, internalcode)
+                    VALUES (@info_id, @code, @info, @complement, @date, @final, @volume, @internalcode)", conn);
+
+                    insertCmd.Parameters.AddWithValue("@info_id", info_id);
+                    insertCmd.Parameters.AddWithValue("@code", (object?)evt.code ?? DBNull.Value);
+                    insertCmd.Parameters.AddWithValue("@info", (object?)evt.info ?? DBNull.Value);
+                    insertCmd.Parameters.AddWithValue("@complement", (object?)evt.complement ?? DBNull.Value);
+                    insertCmd.Parameters.Add("@date", SqlDbType.DateTime).Value = DateTime.TryParse(evt.date, out var dt) ? dt : DBNull.Value;
+                    insertCmd.Parameters.Add("@final", SqlDbType.DateTime).Value = DateTime.TryParse(evt.final, out var dtFinal) ? dtFinal : DBNull.Value;
+                    insertCmd.Parameters.AddWithValue("@volume", (object?)evt.volume ?? DBNull.Value);
+                    insertCmd.Parameters.AddWithValue("@internalcode", (object?)evt.internalCode ?? DBNull.Value);
+
+                    await insertCmd.ExecuteNonQueryAsync();
+
+                    _output.WriteLine("=== ATUALIZADO O RASTREIO ===");
+                    _output.WriteLine(cd_rastreio);
+                    _output.WriteLine("=== NOVO EVENTO ===");
+                    _output.WriteLine(internalCode_);
+                    _output.WriteLine("====================================");
+
+                }
+            }
+        }
         public class TplAuthResponse 
         { 
             public string? token { get; set; }  // ✅ Mudou de "auth" para "token"
@@ -298,7 +375,7 @@ namespace Tracking.Api.Tests
         }
 
 
-        [Fact(DisplayName = "ATUALIZAR EVENTOS", Skip = "Desabilitado temporariamente")]
+        [Fact(DisplayName = "ATUALIZAR EVENTOS")] // , Skip = "Desabilitado temporariamente"
         public async Task AtualizarEventosPedidos()
         {
 
@@ -339,12 +416,24 @@ namespace Tracking.Api.Tests
 
                     if (info != null && shippingevents != null)
                     {
-                        await SalvarDadosTPLAsync(conn, cpf, cd_rastreio, info, shippingevents);
+                        if (await ExisteOrderInfoAsync(conn, cd_rastreio))
+                        {
+                            await AtualizarDadosTPLAsync(conn, cpf, cd_rastreio, info, shippingevents);
+                            _output.WriteLine("=== ATUALIZADO O RASTREIO ===");
+                            _output.WriteLine(cd_rastreio);
+                            _output.WriteLine("====================================");
+                        }
+                        else
+                        {
+                            await SalvarDadosTPLAsync(conn, cpf, cd_rastreio, info, shippingevents);
+                        }
                     }
 
-                    _output.WriteLine("=== INCLUIDO O RASTREIO ===");
-                    _output.WriteLine(cd_rastreio);
-                    _output.WriteLine("====================================");
+                    //if (info != null && shippingevents != null)
+                    //{
+                    //    await SalvarDadosTPLAsync(conn, cpf, cd_rastreio, info, shippingevents);
+                    //}
+
                 }
                 catch (Exception ex)
                 {
@@ -353,6 +442,16 @@ namespace Tracking.Api.Tests
             }
         }
 
+        private static async Task<bool> ExisteOrderInfoAsync(SqlConnection conn, string cd_rastreio)
+        {
+            var cmd = new SqlCommand(
+                "SELECT 1 FROM TRKG_TPLOrderInfo (NOLOCK) WHERE cd_rastreio = @cd_rastreio",
+                conn);
+            cmd.Parameters.AddWithValue("@cd_rastreio", cd_rastreio);
+
+            var result = await cmd.ExecuteScalarAsync();
+            return result != null;
+        }
 
         private static IConfiguration BuildConfiguration()
         {
