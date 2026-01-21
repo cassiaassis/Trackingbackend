@@ -9,6 +9,7 @@ using System.Text.Json;
 using System.Text.Json.Serialization;
 using System.Threading;
 using System.Threading.Tasks;
+using static System.Net.WebRequestMethods;
 
 namespace Tracking.Application
 {
@@ -37,6 +38,7 @@ namespace Tracking.Application
         {
             try
             {
+                //BUSCA O TOKEN
                 var auth = await EnsureAuthAsync(ct);
 
                 // 1) Tenta por order.number (cd_rastreio)
@@ -45,17 +47,6 @@ namespace Tracking.Application
                 {
                     var order = resNumber.response.order;
                     return (order.info, order.shippingevents, order.code ?? 200, order.message);
-                }
-
-                // 2) Fallback por order.id (id_resgate), se fornecido
-                if (orderId.HasValue)
-                {
-                    var resId = await PostOrderDetailAsync(auth, number: null, id: orderId.Value.ToString(), ct);
-                    if (resId.success && resId.response?.order is not null)
-                    {
-                        var order = resId.response.order;
-                        return (order.info, order.shippingevents, order.code ?? 200, order.message);
-                    }
                 }
 
                 var code = resNumber.code ?? 502;
@@ -79,64 +70,43 @@ namespace Tracking.Application
         private async Task<(bool success, int? code, TplOrderDetailResponse? response)>
             PostOrderDetailAsync(string auth, string? number, string? id, CancellationToken ct)
         {
-            var orderReq = new TplOrderRequest { number = number, id = id };
 
-            var serializerOptions = new JsonSerializerOptions
+            var bodyObj = new { auth, order = new { number = number } };
+            var bodyJson = JsonSerializer.Serialize(bodyObj);
+
+            var _tplBaseUrl = "https://oms.tpl.com.br/api";
+            var req = new HttpRequestMessage(HttpMethod.Post, $"{_tplBaseUrl}/get/orderdetail")
             {
-                PropertyNameCaseInsensitive = true,
-                DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull
+                Content = new StringContent(bodyJson, Encoding.UTF8, "application/json")
             };
 
-            var requestBodyJson = JsonSerializer.Serialize(
-                new { auth, order = orderReq },
-                serializerOptions);
 
-            var req = new HttpRequestMessage(HttpMethod.Post, "/get/orderdetail")
-            {
-                Content = new StringContent(requestBodyJson, Encoding.UTF8, "application/json")
-            };
+            var resp = await _http.SendAsync(req);
+            var text = await resp.Content.ReadAsStringAsync();
 
-            var resp = await _http.SendAsync(req, HttpCompletionOption.ResponseHeadersRead, ct);
 
             if (!resp.IsSuccessStatusCode)
                 return (false, (int)resp.StatusCode, null);
 
+            if (string.IsNullOrWhiteSpace(text))
+                return (false, 502, null);
+
+            TplOrderDetailResponse? payload;
             try
             {
-                await using var stream = await resp.Content.ReadAsStreamAsync(ct);
-
-                if (stream.Length == 0)
-                    return (false, 502, null);
-
-                // Verificar se é JSON
-                stream.Position = 0;
-                var buffer = new byte[1];
-                var bytesRead = await stream.ReadAsync(buffer, 0, 1, ct);
-                if (bytesRead == 0 || (buffer[0] != '{' && buffer[0] != '['))
-                {
-                    return (false, 502, null);
-                }
-                stream.Position = 0;
-
-                var payload = await JsonSerializer.DeserializeAsync<TplOrderDetailResponse>(
-                    stream,
-                    new JsonSerializerOptions { PropertyNameCaseInsensitive = true },
-                    ct);
-
-                if (payload is null) return (false, 502, null);
-                if (payload.code != 200 || payload.order is null) return (false, payload.code, payload);
-
-                return (true, 200, payload);
+                payload = JsonSerializer.Deserialize<TplOrderDetailResponse>(text, new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
             }
             catch (JsonException)
             {
                 return (false, 502, null);
             }
-            catch (TaskCanceledException)
-            {
-                throw;
-            }
+
+            if (payload is null) return (false, 502, null);
+            if (payload.code != 200 || payload.order is null) return (false, payload.code, payload);
+
+            return (true, 200, payload);
         }
+
 
         private async Task<string> EnsureAuthAsync(CancellationToken ct)
         {
@@ -148,62 +118,49 @@ namespace Tracking.Application
             var email = _cfg["Tpl:Email"] ?? throw new InvalidOperationException("Tpl:Email não configurado.");
 
             var body = new { apikey = apiKey, token, email };
-            var req = new HttpRequestMessage(HttpMethod.Post, "/get/auth")
+            var bodyJson = JsonSerializer.Serialize(body);
+
+            //var req = new HttpRequestMessage(HttpMethod.Post, "/get/auth")
+            //{
+            //    Content = new StringContent(bodyJson, Encoding.UTF8, "application/json")
+            //};
+
+            var _tplBaseUrl = "https://oms.tpl.com.br/api";
+            var req = new HttpRequestMessage(HttpMethod.Post, $"{_tplBaseUrl}/get/auth")
             {
-                Content = new StringContent(JsonSerializer.Serialize(body), Encoding.UTF8, "application/json")
+                Content = new StringContent(bodyJson, Encoding.UTF8, "application/json")
             };
 
-            var resp = await _http.SendAsync(req, HttpCompletionOption.ResponseHeadersRead, ct);
-            var statusCode = (int)resp.StatusCode;
+            using var http = new HttpClient();
+            var resp = await http.SendAsync(req, ct);
+            var text = await resp.Content.ReadAsStringAsync(ct);
 
             if (!resp.IsSuccessStatusCode)
-            {
-                var errorText = await resp.Content.ReadAsStringAsync(ct);
-                throw new HttpRequestException($"TPL AUTH {statusCode}: {errorText}", null, resp.StatusCode);
-            }
+                throw new HttpRequestException($"TPL AUTH {(int)resp.StatusCode}: {text}", null, resp.StatusCode);
 
+            if (string.IsNullOrWhiteSpace(text))
+                throw new HttpRequestException("Resposta AUTH vazia", null, HttpStatusCode.BadGateway);
+
+            TplAuthResponse? authDoc;
             try
             {
-                await using var stream = await resp.Content.ReadAsStreamAsync(ct);
-
-                if (stream.Length == 0)
-                    throw new HttpRequestException("Resposta AUTH vazia", null, HttpStatusCode.BadGateway);
-
-                stream.Position = 0;
-                var buffer = new byte[1];
-                var bytesRead = await stream.ReadAsync(buffer, 0, 1, ct);
-                if (bytesRead == 0 || (buffer[0] != '{' && buffer[0] != '['))
-                {
-                    var preview = await ReadStartOfStream(stream, ct);
-                    throw new HttpRequestException($"TPL retornou resposta não-JSON: {preview}", null, HttpStatusCode.BadGateway);
-                }
-                stream.Position = 0;
-
-                var authResp = await JsonSerializer.DeserializeAsync<TplAuthResponse>(
-                    stream,
-                    new JsonSerializerOptions { PropertyNameCaseInsensitive = true },
-                    ct)
-                    ?? throw new InvalidOperationException("Resposta AUTH inválida.");
-
-                if (string.IsNullOrWhiteSpace(authResp.token))
-                    throw new HttpRequestException($"TPL AUTH code: {authResp.code}", null, MapToHttpStatus(authResp.code));
-
-                _cachedAuth = authResp.token;
-                _authExpiresUtc = DateTime.UtcNow.AddMinutes(59);
-                return _cachedAuth!;
+                authDoc = JsonSerializer.Deserialize<TplAuthResponse>(text, new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
             }
             catch (JsonException ex)
             {
-                await using var stream = await resp.Content.ReadAsStreamAsync(ct);
-                var preview = await ReadStartOfStream(stream, ct);
-                throw new HttpRequestException($"TPL retornou JSON inválido: {preview}", ex, HttpStatusCode.BadGateway);
+                throw new HttpRequestException($"TPL retornou JSON inválido: {text}", ex, HttpStatusCode.BadGateway);
             }
-            catch (TaskCanceledException)
-            {
-                throw;
-            }
-        }
 
+            if (authDoc is null)
+                throw new HttpRequestException($"Payload AUTH inválido: {text}", null, HttpStatusCode.BadGateway);
+
+            if (string.IsNullOrWhiteSpace(authDoc.token))
+                throw new HttpRequestException($"Token não retornado pela TPL. Payload: {text}", null, HttpStatusCode.BadGateway);
+
+            _cachedAuth = authDoc.token;
+            _authExpiresUtc = DateTime.UtcNow.AddMinutes(59);
+            return _cachedAuth!;
+        }
         private static async Task<string> ReadStartOfStream(Stream stream, CancellationToken ct)
         {
             try
@@ -285,11 +242,12 @@ namespace Tracking.Application
     public class TplShippingEvent
     {
         public int? internalCode { get; set; }
+
         public string? code { get; set; }
         public string? info { get; set; }
         public string? complement { get; set; }
         public string? date { get; set; }
-        public string? final { get; set; }
+        public string? final{ get; set; }
         public string? volume { get; set; }
     }
 

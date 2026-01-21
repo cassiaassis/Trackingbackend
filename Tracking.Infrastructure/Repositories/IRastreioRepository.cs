@@ -9,12 +9,6 @@ namespace Tracking.Infrastructure.Repositories;
 
 public interface IRastreioRepository
 {
-    /// <summary>
-    /// Busca resgate e último rastreio relacionado por CPF ou e‑mail.
-    /// Retorna null se nada encontrado.
-    /// </summary>
-    Task<(ResgateBrinde resgate, RastreioResgate? rastreio)?> BuscarPorCpfOuEmailAsync(
-        string identificador,
-        CancellationToken ct = default);
+    Task<List<RastreioConsultaDto>> BuscarPorCpfOuEmailAsync(string identificador, CancellationToken ct = default);
 }
 

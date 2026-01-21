@@ -11,6 +11,8 @@ using Tracking.Application.Services;
 using Tracking.Application;
 
 var builder = WebApplication.CreateBuilder(args);
+builder.Services.AddScoped<IRastreioRepository, RastreioRepository>();
+builder.Services.AddScoped<IClienteService, ClienteService>();
 
 // DbContext (SQL Server)
 builder.Services.AddDbContext<AppDbContext>(opt =>

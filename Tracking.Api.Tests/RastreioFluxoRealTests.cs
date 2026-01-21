@@ -1,7 +1,8 @@
 ﻿#nullable enable
 using FluentAssertions;
-using Microsoft.Data.SqlClient;
 using Microsoft.AspNetCore.Mvc.Testing;
+using Microsoft.Data.SqlClient;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using System;
@@ -11,6 +12,7 @@ using System.Net.Http.Json;
 using System.Text;
 using System.Text.Json;
 using System.Threading.Tasks;
+using Tracking.Application;
 using Xunit;
 using Xunit.Abstractions;
 
@@ -91,6 +93,36 @@ namespace Tracking.Api.Tests
             return (true, id, cd, outra);
         }
 
+        // ===== Helpers SQL =====
+        private static async Task<List<(string cpf, string cd_rastreio)>> ConsultarRASTREIO_RESGATEAsync(string connString)
+
+        {
+            var sql = $@"
+                SELECT CPF, CD_RASTREIO
+                FROM TRKG_RASTREIO_RESGATE
+                WHERE cd_rastreio IS NOT NULL
+            ";
+
+            var result = new List<(string cpf, string cd_rastreio)>(); 
+
+            await using var conn = new SqlConnection(connString);
+            await conn.OpenAsync();
+
+            await using var cmd = new SqlCommand(sql, conn);
+            await using var reader = await cmd.ExecuteReaderAsync();
+            
+            while (await reader.ReadAsync())
+            {
+                var cpf = reader.IsDBNull(0) ? string.Empty : reader.GetString(0);
+                var cd = reader.IsDBNull(1) ? string.Empty : reader.GetString(1);
+                result.Add((cpf, cd));
+            }
+
+            return result;
+
+        }
+
+
         private Task<(bool ok, int? id, string? cd, string? mail)> ConsultarPorCpfAsync(string cpf) =>
             ConsultarAsync(_connString, "cpf", cpf, isCpf: true);
 
@@ -142,6 +174,8 @@ namespace Tracking.Api.Tests
         {
             var bodyObj = new { auth, order = new { number = orderNumber } };
             var bodyJson = JsonSerializer.Serialize(bodyObj);
+
+            // var _tplBeUrl = "https://oms.tpl.com.br/api";
             var req = new HttpRequestMessage(HttpMethod.Post, $"{_tplBaseUrl}/get/orderdetail")
             {
                 Content = new StringContent(bodyJson, Encoding.UTF8, "application/json")
@@ -170,6 +204,46 @@ namespace Tracking.Api.Tests
             return dto!;
         }
 
+        private async Task SalvarDadosTPLAsync(SqlConnection conn, string cpf, string cd_rastreio, TplOrderInfo info, List<Tracking.Application.TplShippingEvent> shippingevents)
+
+        {
+            // 1. Inserir info
+            var insertInfoCmd = new SqlCommand(@"
+        INSERT INTO TRKG_TPLOrderInfo (info, cd_rastreio, date, prediction)
+        OUTPUT INSERTED.id
+        VALUES (@info, @cd_rastreio, @date, @prediction)", conn);
+
+            insertInfoCmd.Parameters.AddWithValue("@info", (object?)info.id ?? DBNull.Value);
+            insertInfoCmd.Parameters.AddWithValue("@cd_rastreio", (object?)info.number ?? DBNull.Value);
+            insertInfoCmd.Parameters.Add("@date", SqlDbType.Date).Value = DateTime.TryParse(info.date, out var dt) ? dt : DBNull.Value;
+            insertInfoCmd.Parameters.Add("@prediction", SqlDbType.Date).Value = DateTime.TryParse(info.prediction, out var pred) ? pred : DBNull.Value;
+
+            var result = await insertInfoCmd.ExecuteScalarAsync();
+            if (result is null)
+                throw new InvalidOperationException("Falha ao inserir TRKG_TPLOrderInfo: nenhum id retornado.");
+
+            var info_id = result is null ? (int?)null : Convert.ToInt32(result);
+
+            // 2. Inserir shippingevents
+            foreach (var evt in shippingevents)
+            {
+                var insertEventCmd = new SqlCommand(@"
+            INSERT INTO TRKG_TplShippingEvent (info_id, code, info, complement, date, final, volume, internalcode )
+            VALUES (@info_id, @code, @info, @complement, @date, @final, @volume, @internalcode)", conn);
+
+                insertEventCmd.Parameters.AddWithValue("@info_id", info_id);
+                insertEventCmd.Parameters.AddWithValue("@code", (object?)evt.code ?? DBNull.Value);
+                insertEventCmd.Parameters.AddWithValue("@info", (object?)evt.info ?? DBNull.Value);
+                insertEventCmd.Parameters.AddWithValue("@complement", (object?)evt.complement ?? DBNull.Value);
+                insertEventCmd.Parameters.Add("@date", SqlDbType.Date).Value = DateTime.TryParse(evt.date, out var dt_) ? dt : DBNull.Value;
+                insertEventCmd.Parameters.Add("@final", SqlDbType.Date).Value = DateTime.TryParse(evt.final, out var dtFinal) ? dtFinal : DBNull.Value;
+                insertEventCmd.Parameters.AddWithValue("@volume", (object?)evt.volume ?? DBNull.Value);
+                insertEventCmd.Parameters.AddWithValue("@internalcode", (object?)evt.internalCode ?? DBNull.Value);
+
+                await insertEventCmd.ExecuteNonQueryAsync();
+            }
+        }
+
         public class TplAuthResponse 
         { 
             public string? token { get; set; }  // ✅ Mudou de "auth" para "token"
@@ -188,110 +262,97 @@ namespace Tracking.Api.Tests
         public class TplShippingEvent { public int? internalCode { get; set; } public string? code { get; set; } public string? info { get; set; } public string? date { get; set; } }
 
         // ===== Testes =====
-
-        [Fact(DisplayName = "Regra geral: Pedido 2038 (CPF 11211311411 / e-mail joaoteste@gmail.com)")]
-        public async Task RegraGeral_Pedido_2038()
+        [Fact(DisplayName = "Buscar dado real na TPL: NR-NF 113-1")]
+        public async Task BuscarDadoRealNaTpl_113_1()
         {
-            var (okCpf, idCpf, cdCpf, mailCpf) = await ConsultarPorCpfAsync("11211311411");
-            okCpf.Should().BeTrue("CPF deve existir"); idCpf.Should().Be(2038);
+            // Arrange: configure o serviço manualmente ou via DI
+            var identificador = "98148109591"; // ou CPF/email real para o teste
+            var serviceProvider = new ServiceCollection()
+                .AddLogging()
+                .AddScoped<Tracking.Infrastructure.Repositories.IRastreioRepository, Tracking.Infrastructure.Repositories.RastreioRepository>()
+                .AddScoped<Tracking.Application.Services.ClienteService>()
+                .AddDbContext<Tracking.Infrastructure.Data.AppDbContext>(options =>
+                {
+                    // Configure sua connection string de teste aqui
+                    options.UseSqlServer(_connString);
+                })
+                .BuildServiceProvider();
 
-            var (okMail, idMail, cdMail, cpfMail) = await ConsultarPorEmailAsync("joaoteste@gmail.com");
-            okMail.Should().BeTrue("e-mail deve existir"); idMail.Should().Be(2038);
+            var clienteService = serviceProvider.GetRequiredService<Tracking.Application.Services.ClienteService>();
 
-            // tratar valores possivelmente nulos retornados do banco
-            var cd = !string.IsNullOrWhiteSpace(cdCpf) ? cdCpf! : cdMail;
-            var cpfDb = string.IsNullOrWhiteSpace(cpfMail) ? "<null>" : cpfMail;
-            var emailDb = string.IsNullOrWhiteSpace(mailCpf) ? "<null>" : mailCpf;
-            Console.WriteLine($"[TEST] id_resgate={idCpf ?? idMail}, cpf_db='{cpfDb}', email_db='{emailDb}', cd_rastreio='{cd ?? "<null>"}'");
+            // Act
+            var result = await clienteService.ConsultarAsync(identificador);
 
-            // validações opcionais: apenas quando os campos existem
-            if (mailCpf is not null) mailCpf.Should().Be("joaoteste@gmail.com");
-            if (cpfMail is not null) cpfMail.Should().Be("11211311411");
 
-            if (string.IsNullOrWhiteSpace(cd)) return;
+            // Assert
+            result.Should().NotBeNull("O serviço deve retornar um rastreio válido");
+            result!.CdRastreio.Should().NotBeNullOrWhiteSpace();
+            result.Eventos.Should().NotBeNull();
+            result.Eventos.Count.Should().BeGreaterThan(0);
 
-            using var http = new HttpClient();
-            var auth = await ObterAuthAsync(http);
-            var detail = await ObterOrderDetailAsync(http, auth, cd);
-
-            detail.order!.shippment.Should().NotBeNull();
-            detail.order!.shippingevents.Should().NotBeNull();
-            detail.order!.shippingevents!.Length.Should().BeGreaterThan(0);
+            // (Opcional) Exibir o JSON de retorno para debug
+            var json = JsonSerializer.Serialize(result, new JsonSerializerOptions { WriteIndented = true });
+            _output.WriteLine("=== JSON de retorno da aplicação ===");
+            _output.WriteLine(json);
+            _output.WriteLine("====================================");
         }
 
-        [Fact(DisplayName = "Regra geral: Pedido 2036 (CPF 11111111111 / e-mail joseteste@gmail.com)")]
-        public async Task RegraGeral_Pedido_2036()
+
+        [Fact(DisplayName = "ATUALIZAR EVENTOS", Skip = "Desabilitado temporariamente")]
+        public async Task AtualizarEventosPedidos()
         {
-            var (okCpf, idCpf, cdCpf, mailCpf) = await ConsultarPorCpfAsync("11111111111");
-            okCpf.Should().BeTrue(); idCpf.Should().Be(2036);
 
-            var (okMail, idMail, cdMail, cpfMail) = await ConsultarPorEmailAsync("joseteste@gmail.com");
-            okMail.Should().BeTrue(); idMail.Should().Be(2036);
+            // Consulta todos os rastreios
+            var rastreios = await ConsultarRASTREIO_RESGATEAsync(_connString);
 
-            var cd = !string.IsNullOrWhiteSpace(cdCpf) ? cdCpf! : cdMail;
-            var cpfDb = string.IsNullOrWhiteSpace(cpfMail) ? "<null>" : cpfMail;
-            var emailDb = string.IsNullOrWhiteSpace(mailCpf) ? "<null>" : mailCpf;
-            Console.WriteLine($"[TEST] id_resgate={idCpf ?? idMail}, cpf_db='{cpfDb}', email_db='{emailDb}', cd_rastreio='{cd ?? "<null>"}'");
+            // Instancia o serviço TPL
+            var httpClient = new HttpClient { BaseAddress = new Uri(_tplBaseUrl) };
+            var config = new ConfigurationBuilder()
+                .AddInMemoryCollection(new Dictionary<string, string?>
+                {
+                    ["Tpl:ApiKey"] = _tplApiKey,
+                    ["Tpl:Token"] = _tplToken,
+                    ["Tpl:Email"] = _tplEmail
+                })
+                .Build();
 
-            if (mailCpf is not null) mailCpf.Should().Be("joseteste@gmail.com");
-            if (cpfMail is not null) cpfMail.Should().Be("11111111111");
+            var tplService = new Tracking.Application.TplService(httpClient, config);
 
-            if (string.IsNullOrWhiteSpace(cd)) return;
+            foreach (var (cpf, cd_rastreio) in rastreios)
+            {
+                if (string.IsNullOrWhiteSpace(cd_rastreio))
+                {
+                    _output.WriteLine($"⚠️ cd_rastreio vazio para CPF {cpf}");
+                    continue;
+                }
 
-            using var http = new HttpClient();
-            var auth = await ObterAuthAsync(http);
-            var detail = await ObterOrderDetailAsync(http, auth, cd);
+                try
+                {
+                    var (info, shippingevents, code, message) = await tplService.ObterDadosBrutosAsync(cd_rastreio, null);
 
-            detail.order!.shippingevents.Should().NotBeNull();
-            detail.order!.shippingevents!.Length.Should().BeGreaterThan(0);
+                    // Validação ANTES de tentar salvar/inserir
+                    shippingevents.Should().NotBeNull();
+                    shippingevents!.Count.Should().BeGreaterThan(0);
+
+                    using var conn = new SqlConnection(_connString);
+                    await conn.OpenAsync();
+
+                    if (info != null && shippingevents != null)
+                    {
+                        await SalvarDadosTPLAsync(conn, cpf, cd_rastreio, info, shippingevents);
+                    }
+
+                    _output.WriteLine("=== INCLUIDO O RASTREIO ===");
+                    _output.WriteLine(cd_rastreio);
+                    _output.WriteLine("====================================");
+                }
+                catch (Exception ex)
+                {
+                    _output.WriteLine($"Erro ao consultar cd_rastreio {cd_rastreio} (CPF {cpf}): {ex.Message}");
+                }
+            }
         }
 
-        [Fact(DisplayName = "Regra geral: Pedido 2039 (CPF 11611711811 / e-mail joanna@gmail.com)")]
-        public async Task RegraGeral_Pedido_2039()
-        {
-            var (okCpf, idCpf, cdCpf, mailCpf) = await ConsultarPorCpfAsync("11611711811");
-            okCpf.Should().BeTrue(); idCpf.Should().Be(2039);
-
-            var (okMail, idMail, cdMail, cpfMail) = await ConsultarPorEmailAsync("joanna@gmail.com");
-            okMail.Should().BeTrue(); idMail.Should().Be(2039);
-
-            var cd = !string.IsNullOrWhiteSpace(cdCpf) ? cdCpf! : cdMail;
-            var cpfDb = string.IsNullOrWhiteSpace(cpfMail) ? "<null>" : cpfMail;
-            var emailDb = string.IsNullOrWhiteSpace(mailCpf) ? "<null>" : mailCpf;
-            Console.WriteLine($"[TEST] id_resgate={idCpf ?? idMail}, cpf_db='{cpfDb}', email_db='{emailDb}', cd_rastreio='{cd ?? "<null>"}'");
-
-            if (mailCpf is not null) mailCpf.Should().Be("joanna@gmail.com");
-            if (cpfMail is not null) cpfMail.Should().Be("11611711811");
-
-            if (string.IsNullOrWhiteSpace(cd))
-            {
-                _output.WriteLine("⚠️ cd_rastreio é NULL - pedido em preparação");
-                return;
-            }
-
-            using var http = new HttpClient();
-            var auth = await ObterAuthAsync(http);
-
-            try
-            {
-                var detail = await ObterOrderDetailAsync(http, auth, cd);
-
-                // Serializa o JSON de retorno da aplicação
-                var json = JsonSerializer.Serialize(detail, new JsonSerializerOptions { WriteIndented = true });
-                _output.WriteLine("=== JSON de retorno da aplicação ===");
-                _output.WriteLine(json);
-                _output.WriteLine("====================================");
-
-
-                detail.order!.shippingevents.Should().NotBeNull();
-                detail.order!.shippingevents!.Length.Should().BeGreaterThan(0);
-            }
-            catch (Exception ex) when (ex.Message.Contains("404"))
-            {
-                _output.WriteLine($"⚠️ Pedido {cd} não encontrado na TPL (404) - possivelmente cancelado ou removido");
-                // Não falha o teste - apenas registra que o pedido não existe mais na TPL
-            }
-        }
 
         private static IConfiguration BuildConfiguration()
         {

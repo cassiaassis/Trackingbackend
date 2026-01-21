@@ -15,60 +15,79 @@ namespace Tracking.Infrastructure.Repositories
         private readonly AppDbContext _db;
         public RastreioRepository(AppDbContext db) => _db = db;
 
-        public async Task<(ResgateBrinde resgate, RastreioResgate? rastreio)?> BuscarPorCpfOuEmailAsync(
-            string identificador,
-            CancellationToken ct = default)
+        public async Task<List<RastreioConsultaDto>> BuscarPorCpfOuEmailAsync(string identificador, CancellationToken ct = default)
         {
-            var raw = identificador.Trim();
-            var digits = new string(raw.Where(char.IsDigit).ToArray());
-            bool isCpf = digits.Length == 11;
+            var results = new List<RastreioConsultaDto>();
+            var conn = _db.Database.GetDbConnection();
 
-            if (isCpf)
+            // Ajuste o filtro conforme sua necessidade (por CPF ou Email)
+            var filtro = identificador.Trim().ToLowerInvariant();
+            var isCpf = filtro.All(char.IsDigit) && filtro.Length == 11;
+            var where = isCpf ? "c.cpf = @identificador" : "LOWER(LTRIM(RTRIM(c.email))) COLLATE Latin1_General_CI_AI = @identificador";
+
+            var sql = $@"
+                        select 
+                            c.cpf, c.email, a.cd_rastreio, a.prediction, d.id_timeline, d.status_timeline, d.ds_timeline, b.date as final
+                        from TRKG_TPLOrderInfo a (nolock)
+                        inner join TRKG_TplShippingEvent b (nolock)
+                            on a.id = b.info_id
+                        inner join TRKG_RASTREIO_RESGATE c (nolock)
+                            on a.cd_rastreio = c.cd_rastreio
+                        left outer join DBO.TRKG_RASTREIO_STATUS d (nolock)
+                            on b.internalcode = d.internalcode_TPL
+                        where {where}
+                        group by c.cpf, c.email, a.cd_rastreio, a.prediction, d.id_timeline, d.status_timeline, d.ds_timeline, b.date
+                        order by d.id_timeline desc
+                    ";
+
+            await using (var command = conn.CreateCommand())
             {
-                // CPF prioritário em TRKG_RASTREIO_RESGATE
-                var item = await _db.Rastreios
-                    .AsNoTracking()
-                    .Include(r => r.Resgate)
-                    .Where(r => r.Cpf == digits)
-                    .OrderByDescending(r => r.DtAtualizacao ?? r.DtRegistro ?? DateTime.MinValue)
-                    .ThenByDescending(r => r.IdRastreio)
-                    .FirstOrDefaultAsync(ct);
+                command.CommandText = sql;
+                command.CommandType = System.Data.CommandType.Text;
 
-                if (item is null) return null;
-                return (item.Resgate, item);
+                var param = command.CreateParameter();
+                param.ParameterName = "@identificador";
+                param.Value = filtro;
+                command.Parameters.Add(param);
+
+                if (conn.State != System.Data.ConnectionState.Open)
+                    await conn.OpenAsync(ct);
+
+                await using var reader = await command.ExecuteReaderAsync(ct);
+                while (await reader.ReadAsync(ct))
+                {
+                    results.Add(new RastreioConsultaDto
+                    {
+                        Cpf = reader["cpf"] as string,
+                        Email = reader["email"] as string,
+                        CdRastreio = reader["cd_rastreio"] as string,
+                        Prediction = reader["prediction"] as DateTime?,
+                        IdTimeline = reader["id_timeline"] as int?,
+                        StatusTimeline = reader["status_timeline"] as string,
+                        Dstimeline = reader["ds_timeline"] as string,
+                        Final = reader["final"] as DateTime?
+                    });
+                }
             }
-            else
-            {
-                // EMAIL prioritário em TRKG_RASTREIO_RESGATE
-                var item = await _db.Rastreios
-                    .AsNoTracking()
-                    .Include(r => r.Resgate)
-                    .Where(r => r.Email != null && r.Email.ToLower() == raw.ToLower())
-                    .OrderByDescending(r => r.DtAtualizacao ?? r.DtRegistro ?? DateTime.MinValue)
-                    .ThenByDescending(r => r.IdRastreio)
-                    .FirstOrDefaultAsync(ct);
 
-                if (item is not null)
-                    return (item.Resgate, item);
-
-                // Fallback: resgate por e‑mail (pode não ter rastreio ainda)
-                var resgate = await _db.Resgates
-                    .AsNoTracking()
-                    .Include(r => r.Rastreios)
-                    .Where(r => r.Email != null && r.Email.ToLower() == raw.ToLower())
-                    .OrderByDescending(r => r.DtAtualizacao ?? r.DtRegistro ?? DateTime.MinValue)
-                    .ThenByDescending(r => r.IdResgate)
-                    .FirstOrDefaultAsync(ct);
-
-                if (resgate is null) return null;
-
-                var rastreio = resgate.Rastreios
-                    .OrderByDescending(x => x.DtAtualizacao ?? x.DtRegistro ?? DateTime.MinValue)
-                    .ThenByDescending(x => x.IdRastreio)
-                    .FirstOrDefault(); // pode ser null => "preparando"
-
-                return (resgate, rastreio);
-            }
+            return results;
         }
+
+
     }
+
+
+    public class RastreioConsultaDto
+    {
+        public string? Cpf { get; set; }
+        public string? Email { get; set; }
+        public string? CdRastreio { get; set; }
+        public DateTime? Prediction { get; set; }
+        public int? IdTimeline { get; set; }
+        public string? StatusTimeline { get; set; }
+        public string? Dstimeline { get; set; }
+        public DateTime? Final { get; set; }
+    }
+
+
 }

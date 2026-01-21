@@ -15,9 +15,5 @@ public interface IClienteService
     /// </summary>
     Task<RastreioResponse?> ConsultarAsync(string identificador, CancellationToken ct = default);
 
-    /// <summary>
-    /// Consulta por CPF ou e-mail e retorna dados simplificados da TPL (info + shippingevents).
-    /// Retorna mensagem específica quando CPF/e-mail não é encontrado ou pedido está em preparação.
-    /// </summary>
-    Task<RastreioTplResponse?> ConsultarTplAsync(string identificador, CancellationToken ct = default);
+
 }
